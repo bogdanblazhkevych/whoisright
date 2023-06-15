@@ -1,8 +1,6 @@
-.textinputwrapper{
+.textoutputwrapper{
     box-sizing: border-box;
     border: 1px solid green;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-grow: 1;
 }
-

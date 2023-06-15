@@ -9,7 +9,7 @@ export default function Textinput(){
                 <input className={textcss.inputelement}></input>
             </div>
             <div className={textcss.sendbutton}>
-
+                <button>send</button>
             </div>
         </div>
     )
