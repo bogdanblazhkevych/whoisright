@@ -13,7 +13,7 @@ interface ClientToServerEvents {
   hello: () => void;
 }
 
-const socket: Socket<ClientToServerEvents, ServerToClientEvents> = io();
+const socket: Socket<ClientToServerEvents, ServerToClientEvents> = io('http://localhost:8000');
 
 function App() {
   return (
