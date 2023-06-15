@@ -19,7 +19,8 @@ io.on('connection', (socket) => {
     console.log('a user connected');
 
     socket.on("send_message", (message) => {
-        console.log(message)
+        socket.emit('receive_message', {message: message});
+        console.log('received in server')
     })
 });
 
