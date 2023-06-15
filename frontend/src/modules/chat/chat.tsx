@@ -29,9 +29,8 @@ export default function Chat(){
 
     useEffect(() => {
         socket.on('receive_message', (message) => {
-            setMessageLog((previous) => [...previous, message])
-            console.log(messageLog)
-            console.log(message)
+            setMessageLog((previous) => [...previous, message])  
+            console.log(message)          
         })
     }, [socket])
 
@@ -41,7 +40,7 @@ export default function Chat(){
 
     return(
         <div className={chatcss.chatwrapper}>
-            <Textoutput />
+            <Textoutput messageLog={messageLog}/>
             <Textinput sendMessage={sendMessage}/>
         </div>
     )
