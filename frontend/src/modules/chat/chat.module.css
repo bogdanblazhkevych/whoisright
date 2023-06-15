@@ -1,0 +1,9 @@
+.chatwrapper{
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    border: 1px solid red;
+    max-width: 800px;
+}
