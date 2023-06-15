@@ -5,9 +5,15 @@ import http from 'http';
 
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server)
 app.use(cors());
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+      origin: "http://localhost:3000",
+      methods: ["GET", "POST"],
+    },
+  });
+  
   
 io.on('connection', (socket) => {
     console.log('a user connected');
@@ -20,6 +26,6 @@ app.get('/', function(req, res){
     console.log(req)
 })
 
-app.listen(port, function() {
+server.listen(port, function() {
     console.log(`server is running on port ${port}`)
 })
