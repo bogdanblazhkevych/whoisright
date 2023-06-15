@@ -17,6 +17,10 @@ const io = new Server(server, {
   
 io.on('connection', (socket) => {
     console.log('a user connected');
+
+    socket.on("send_message", (message) => {
+        console.log(message)
+    })
 });
 
 const port = process.env.PORT || 8000;

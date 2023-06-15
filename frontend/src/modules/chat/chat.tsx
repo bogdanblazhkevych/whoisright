@@ -12,15 +12,21 @@ interface ServerToClientEvents {
 
 interface ClientToServerEvents {
   hello: () => void;
+  send_message: (message: string) => void;
 }
 
-const socket: Socket<ClientToServerEvents, ServerToClientEvents> = io('http://localhost:8000');
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:8000');
 
 export default function Chat(){
+
+    function sendMessage(message: string) {
+        socket.emit("send_message", message)
+    }
+
     return(
         <div className={chatcss.chatwrapper}>
             <Textoutput />
-            <Textinput />
+            <Textinput sendMessage={sendMessage}/>
         </div>
     )
 }
