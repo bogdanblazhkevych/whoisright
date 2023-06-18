@@ -5,29 +5,36 @@ import chatcss from "./chat.module.css"
 import { io, Socket } from "socket.io-client";
 
 interface ServerToClientEvents {
-  noArg: () => void;
-  basicEmit: (a: number, b: string, c: Buffer) => void;
-  withAck: (d: string, callback: (e: number) => void) => void;
-  receive_message: (a: ChatMessageInterface) => void;
+  receive_message: (dataObject: {message: string, sessionId: string}) => void;
 }
 
 interface ClientToServerEvents {
-  hello: () => void;
-  send_message: (message: string) => void;
+  send_message: (dataObject: {message: string, sessionId: string}) => void;
+  join_room: (sessionId: string) => void;
 }
 
 interface ChatMessageInterface {
     // sender: string;
-    message: string
+    message: string,
+    sessionId: string
+}
+
+interface ChatPropsInterface {
+    sessionId: string
 }
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:8000');
 
-export default function Chat(){
+export default function Chat(props: ChatPropsInterface){
+
+    const { sessionId } = props;
 
     const [messageLog, setMessageLog] = useState<ChatMessageInterface[]>([]);
 
     useEffect(() => {
+        socket.emit('join_room', sessionId)
+        console.log(sessionId)
+
         socket.on('receive_message', (message) => {
             setMessageLog((previous) => [...previous, message])  
             console.log(message)          
@@ -35,7 +42,7 @@ export default function Chat(){
     }, [socket])
 
     function sendMessage(message: string) {
-        socket.emit("send_message", message)
+        socket.emit("send_message", {message, sessionId})
     }
 
     return(

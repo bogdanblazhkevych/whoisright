@@ -1,0 +1,17 @@
+.joinwrapper{
+    display: flex;
+    box-sizing: border-box;
+    border: 1px solid purple;
+    max-width: 800px;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+}
+
+.joinwrapper > button, input {
+    align-self: center;
+}
+
+.sessionId{
+    align-self: center;
+}
