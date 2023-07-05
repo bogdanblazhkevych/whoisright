@@ -3,7 +3,9 @@ import textoutputcss from './textoutput.module.css'
 
 interface ChatMessageInterface {
     // sender: string;
-    message: string
+    message: string,
+    sessionId: string,
+    type: string
 }
 
 interface TextoutputInterface {
@@ -15,8 +17,8 @@ export default function Textoutput(props: TextoutputInterface){
 
     return(
         <div className={textoutputcss.textoutputwrapper}>
-            {messageLog.map((chatMessage: ChatMessageInterface) => {
-                return <div>{chatMessage.message}</div>
+            {messageLog.map((chatMessage: ChatMessageInterface, index: number) => {
+                return <div key={index} className={`${textoutputcss.message} ${textoutputcss[chatMessage.type]}`}>{chatMessage.message}</div>
             })}
         </div>
     )

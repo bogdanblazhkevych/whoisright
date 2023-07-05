@@ -1,7 +1,30 @@
 .textoutputwrapper{
     box-sizing: border-box;
-    border: 1px solid green;
+    /* border: 1px solid green; */
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    padding: 10px;
+}
+
+.message{
+    /* padding: 0.2rem;
+    margin: 0.1rem; */
+    border-radius: 20px;
+    padding: 8px 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+.incomming{
+    background-color: #3A3A3C;
+    color: #E1E1E3;
+    align-self: flex-start;
+}
+
+.outgoing{
+    color: #E1E1E3;
+    background-color: #148AFF;
+    align-self: flex-end;
 }

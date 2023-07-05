@@ -1,11 +1,12 @@
 .App {
-  border: 1px solid blue;
+  /* border: 1px solid blue; */
   text-align: center;
   display: flex;
   justify-content: center;
   overflow: hidden;
   box-sizing: border-box;
   min-height: 100vh;
+  background-color: #1E1E1E;
   /* min-height: fill-available; */
   /* min-height: -webkit-fill-available; */
 }
