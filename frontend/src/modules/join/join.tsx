@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import joincss from "./join.module.css"
 import { io, Socket } from "socket.io-client";
+import { join } from "path";
 
 interface ServerToClientEvents {
   code_generated: (a: string) => void;
@@ -73,12 +74,12 @@ export default function Join(props: JoinPropsInterface){
         <div className={joincss.joinwrapper}>
             {currentJoinDisplay === "chose" &&
                 <>
-                    <button onClick={createSession}>
-                        Create Session
-                    </button>
-                    <button onClick={joinSession}>
-                        Join Session
-                    </button>
+                    <div className={joincss.divbutton} onClick={createSession}>
+                        Create <br></br> Session
+                    </div>
+                    <div className={joincss.divbutton} onClick={joinSession}>
+                        Join <br></br> Session
+                    </div>
                 </>
             }
             {currentJoinDisplay === "show-code" && 
@@ -90,7 +91,7 @@ export default function Join(props: JoinPropsInterface){
             }
             {currentJoinDisplay === "enter-code" && 
                 <>
-                    <input onChange={handleInputChange} onKeyDown={handleKeyDown} value={codeInput}></input>
+                    <input className={joincss.codeinput} onChange={handleInputChange} onKeyDown={handleKeyDown} value={codeInput}></input>
                 </>
             }
         </div>

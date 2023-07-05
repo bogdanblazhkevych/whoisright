@@ -5,18 +5,19 @@ import chatcss from "./chat.module.css"
 import { io, Socket } from "socket.io-client";
 
 interface ServerToClientEvents {
-  receive_message: (dataObject: {message: string, sessionId: string}) => void;
+  receive_message: (dataObject: {message: string, sessionId: string, type: string}) => void;
 }
 
 interface ClientToServerEvents {
-  send_message: (dataObject: {message: string, sessionId: string}) => void;
+  send_message: (dataObject: {message: string, sessionId: string, type: string}) => void;
   join_room: (sessionId: string) => void;
 }
 
 interface ChatMessageInterface {
     // sender: string;
     message: string,
-    sessionId: string
+    sessionId: string,
+    type: string
 }
 
 interface ChatPropsInterface {
@@ -33,16 +34,20 @@ export default function Chat(props: ChatPropsInterface){
 
     useEffect(() => {
         socket.emit('join_room', sessionId)
-        console.log(sessionId)
 
         socket.on('receive_message', (message) => {
-            setMessageLog((previous) => [...previous, message])  
-            console.log(message)          
+            setMessageLog((previous) => [...previous, message])            
         })
     }, [socket])
 
+    useEffect(() => {
+        console.log(messageLog)
+    }, [messageLog])
+
     function sendMessage(message: string) {
-        socket.emit("send_message", {message, sessionId})
+        const type = "outgoing"
+        socket.emit("send_message", {message, sessionId, type})
+        setMessageLog((previous) => [...previous, {message, sessionId, type}]) 
     }
 
     return(
