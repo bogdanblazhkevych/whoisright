@@ -4,6 +4,7 @@ import Chat from './modules/chat/chat';
 import Join from './modules/join/join';
 
 function App() {
+  console.log("retard")
 
   const [currentDisplay, setCurrentDisplay] = useState('find-session');
   const [sessionId, setSessionId] = useState('')

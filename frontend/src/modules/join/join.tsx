@@ -19,7 +19,7 @@ interface JoinPropsInterface {
     setSessionId: (a: string) => void;
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:8000');
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://192.168.1.9:8000');
 
 export default function Join(props: JoinPropsInterface){
 
@@ -30,6 +30,7 @@ export default function Join(props: JoinPropsInterface){
     const [isValidated, setIsValidated] = useState(false)
 
     function createSession(){
+        console.log("create session button")
         socket.emit("generate_code")
     }
 
