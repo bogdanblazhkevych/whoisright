@@ -17,7 +17,7 @@ export default function Textinput(props: Textinputprops){
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>):void {
         if (e.key === 'Enter') {
             sendMessage(message)
-            console.log(message)
+            setMessage('')
         }
     }
 
