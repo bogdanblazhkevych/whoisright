@@ -2,8 +2,18 @@ import express from 'express'
 import cors from 'cors';
 import { Server } from 'socket.io';
 import http from 'http';
-import crypto from 'crypto'
+import crypto from 'crypto';
+import dotenv from 'dotenv';
+import { Configuration, OpenAIApi } from 'openai';
 import { checkServerIdentity } from 'tls';
+
+dotenv.config();
+
+const configuration = new Configuration({
+    apiKey: process.env.API_KEY,
+});
+
+const openai = new OpenAIApi(configuration);
 
 
 const app = express();
@@ -11,7 +21,8 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000",
+    //   origin: "http://localhost:3000",
+    origin: "http://192.168.1.9:3000",
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -19,24 +30,24 @@ const io = new Server(server, {
 const chatRooms = {}
   
 io.on('connection', (socket) => {
-    console.log(chatRooms);
+
+    console.log(`on connection,   ${socket}`)
 
     socket.on("join_room", (sessionId) => {
-        console.log(sessionId)
-        console.log(`joined room${sessionId}`)
+        console.log(`joined room ${sessionId}`)
         socket.join(sessionId)
     })
 
     socket.on("send_message", (messageData) => {
-        socket.to(messageData.sessionId).emit('receive_message', messageData)
-        console.log(messageData.message)
+        let updatedMessageData = {...messageData};
+        updatedMessageData.type = "incomming"
+        socket.to(messageData.sessionId).emit('receive_message', updatedMessageData)
     })
 
     socket.on("generate_code", () => {
         const code = generateCode();
         chatRooms[code] = {connectedUsers: 1, userAValidated: true, userASocket: socket, userBValidated: false, userBSocket: null};
         socket.emit('code_generated', code);
-        console.log(chatRooms[code].connectedUsers)
     })
 
     socket.on("validate_code", (code) => {

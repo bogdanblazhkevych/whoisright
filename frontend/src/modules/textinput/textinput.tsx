@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import textcss from "./textinput.module.css"
+import { BsFillArrowUpRightCircleFill } from 'react-icons/bs';
 
 interface Textinputprops {
     sendMessage: (message: string) => void;
@@ -27,7 +28,9 @@ export default function Textinput(props: Textinputprops){
                 <input className={textcss.inputelement} value={message} onChange={handleInputChange} onKeyDown={handleKeyDown}></input>
             </div>
             <div className={textcss.sendbutton}>
-                <button>send</button>
+                <div className={textcss.arrowicon}>
+                    <BsFillArrowUpRightCircleFill />
+                </div>
             </div>
         </div>
     )
