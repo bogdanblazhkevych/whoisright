@@ -7,3 +7,34 @@
     padding-bottom: env(safe-area-inset-bottom);
 }
 
+.inputelement{
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    box-shadow: none;
+    box-sizing: border-box;
+    border-radius: 20px;
+    padding: 8px 15px;
+    border: 2px solid #4C4C4C;
+    background-color: #1E1E1E;
+    color: white;
+}
+
+.inputelement:focus{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    box-shadow: none;
+    /* border: none; */
+}
+
+.inputelement:active{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    box-shadow: none;
+    /* border: none; */
+}

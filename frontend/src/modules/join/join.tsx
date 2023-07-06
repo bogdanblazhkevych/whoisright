@@ -31,7 +31,6 @@ export default function Join(props: JoinPropsInterface){
     const [isValidated, setIsValidated] = useState(false)
 
     function createSession(){
-        console.log("create session button")
         socket.emit("generate_code")
     }
 
@@ -40,7 +39,8 @@ export default function Join(props: JoinPropsInterface){
     }
 
     function handleInputChange(e: React.ChangeEvent<HTMLInputElement>):void {
-        setCodeInput(e.target.value)
+        let codeInputUpperCase = e.target.value.toUpperCase()
+        setCodeInput(codeInputUpperCase)
     }
 
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>):void {
