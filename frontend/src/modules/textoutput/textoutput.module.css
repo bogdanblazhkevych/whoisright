@@ -15,16 +15,19 @@
     margin-top: 5px;
     margin-bottom: 5px;
     display: inline-block;
+    max-width: 70%;
 }
 
 .incomming{
     background-color: #3A3A3C;
     color: #E1E1E3;
     align-self: flex-start;
+    text-align: left;
 }
 
 .outgoing{
     color: #E1E1E3;
     background-color: #148AFF;
     align-self: flex-end;
+    text-align: left;
 }
