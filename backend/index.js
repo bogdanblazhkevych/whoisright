@@ -22,16 +22,72 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
     //   origin: "http://localhost:3000",
-    origin: "http://192.168.1.9:3000",
+    origin: `http://192.168.1.3:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
 
+
+// ------ chatRooms Schema ------
+// chatRooms = {
+//     A6B78H: {
+//         connectedUsers: 2,
+//         userA: {
+//             validated: true,
+//             socket: "socket object",
+//             userID: "556795"
+//         },
+//         userB: {
+//             validated: true,
+//             socket: "socket object",
+//             userID: "998654"
+//         },
+//         messages: [
+//             {
+//                 userId: "998654",
+//                 message: "you stole my code"
+//             },
+
+//             {
+//                 userId: "556795",
+//                 message: "you stole it from WDS"
+//             }
+//         ]
+//     }
+// }
+
 const chatRooms = {}
+
+function createStringMessageLog(messageLog) {
+    let string = ''
+
+    messageLog.map((message) => {
+        string += `${message.userId}: ${message.message}: `
+    })
+
+    return string
+}
+
+async function getVerdict(messageLog) {
+
+    const primer = `You are a conflict mediator. You must analyze these two points of view and 
+    come to a definative resolution. You must only use the conversation avalible at hand: do not ask 
+    to be provided with aditional context or evidence. You are less of a conflict mediator, more-so te judge, 
+    the jury, and executioner. What you say goes and you have the final decision. You must make one that is 
+    firm and decisive. You may on ocassion declare no winners, but keep this as a last resort option. Keep 
+    your rulings brief, 15 sentences maximum.`
+
+    const chatString = createStringMessageLog(messageLog)
+
+    const completion = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [{"role": "system", "content": primer}, {role: "user", content: chatString}],
+    });
+
+    return completion.data.choices[0].message.content
+}
   
 io.on('connection', (socket) => {
-
-    console.log(`on connection,   ${socket}`)
 
     socket.on("join_room", (sessionId) => {
         console.log(`joined room ${sessionId}`)
@@ -39,14 +95,57 @@ io.on('connection', (socket) => {
     })
 
     socket.on("send_message", (messageData) => {
+        
         let updatedMessageData = {...messageData};
-        updatedMessageData.type = "incomming"
-        socket.to(messageData.sessionId).emit('receive_message', updatedMessageData)
+        updatedMessageData.type = "incomming";
+        socket.to(messageData.sessionId).emit('receive_message', updatedMessageData);
+
+        let messageLog = {
+            userId: messageData.userId,
+            message: messageData.message
+        };
+
+        chatRooms[messageData.sessionId].messages.push(messageLog);
+        console.log(chatRooms[messageData.sessionId].messages);
+
+        if (chatRooms[messageData.sessionId].messages.length === 2) {
+            getVerdict(chatRooms[messageData.sessionId].messages)
+            .then((verdict) => {
+                let verdictMessageData = {
+                    message: verdict,
+                    sessionId: messageData.sessionId,
+                    type: 'incomming',
+                    userId: 'Mediator'
+                };
+
+                let userAsocket = chatRooms[messageData.sessionId].userA.socket;
+                userAsocket.to(messageData.sessionId).emit('receive_message', verdictMessageData);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        }
     })
 
     socket.on("generate_code", () => {
         const code = generateCode();
-        chatRooms[code] = {connectedUsers: 1, userAValidated: true, userASocket: socket, userBValidated: false, userBSocket: null};
+        const userAID = generateCode();
+
+        chatRooms[code] = {
+            connectedUsers: 1,
+            userA: {
+                validated: true,
+                socket: socket,
+                userID: userAID
+            },
+            userB: {
+                validated: false,
+                socket: null,
+                userID: null
+            },
+            messages: []
+        };
+
         socket.emit('code_generated', code);
     })
 
@@ -54,13 +153,16 @@ io.on('connection', (socket) => {
         if (chatRooms[code]) {
 
             if (chatRooms[code].connectedUsers === 1) {
+                const userBID = generateCode();
+
                 chatRooms[code].connectedUsers = 2;
-                chatRooms[code].userBValidated = true;
-                chatRooms[code].userBSocket = socket;
-    
-                if (chatRooms[code].userAValidated && chatRooms[code].userBValidated) {
-                    chatRooms[code].userASocket.emit("all_users_validated")
-                    chatRooms[code].userBSocket.emit("all_users_validated")
+                chatRooms[code].userB.validated = true;
+                chatRooms[code].userB.socket = socket;
+                chatRooms[code].userB.userID = userBID;
+
+                if (chatRooms[code].userA.validated && chatRooms[code].userB.validated) {
+                    chatRooms[code].userA.socket.emit("all_users_validated", chatRooms[code].userA.userID)
+                    chatRooms[code].userB.socket.emit("all_users_validated", chatRooms[code].userB.userID)
                 }
             }
         }
