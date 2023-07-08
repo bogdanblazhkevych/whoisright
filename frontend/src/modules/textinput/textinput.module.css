@@ -9,6 +9,7 @@
 
 .typefield{
     width: 60%;
+    position: relative;
 }
 
 .inputelement{
@@ -26,7 +27,9 @@
     box-shadow: none;
     box-sizing: border-box;
     border-radius: 20px;
-    border: 2px solid #4C4C4C;
+    /* border: 2px solid #4C4C4C; */
+    border: none;
+    outline: 2px solid #4C4C4C;
     background-color: #1E1E1E;
     color: white;
     resize: none; 
@@ -40,17 +43,20 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    outline: none;
+    /* outline: none; */
+    outline: 2px solid #4C4C4C;
     box-shadow: none;
+    border: none;
 }
 
 .inputelement:active{
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    outline: none;
+    /* outline: none; */
     box-shadow: none;
-    /* border: none; */
+    outline: 2px solid #4C4C4C;
+    border: none;
 }
 
 .typefield{
@@ -58,20 +64,18 @@
 }
 
 .sendbutton{
-    position: relative;
-    height: 100%;
+    position: absolute;
+    top: 1.5px;
+    right: 2px;
     display: flex;
-    padding-bottom: 15px;
-    /* align-self: flex-end; */
+    transform: scale(1);
 }
 
 .arrowicon{
     background: white;
-    box-sizing: border-box;
+    /* box-sizing: border-box; */
     border-radius: 50%;
     color: #148AFF;
     font-size: 2rem;
     display: flex;
-    transform: translate(-2.2rem, -1px);
-    align-self: flex-end;
 }

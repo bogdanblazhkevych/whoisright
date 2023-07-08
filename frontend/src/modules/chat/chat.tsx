@@ -5,7 +5,7 @@ import chatcss from "./chat.module.css"
 import { io, Socket } from "socket.io-client";
 
 interface ServerToClientEvents {
-  receive_message: (dataObject: {message: string, sessionId: string, type: string}) => void;
+  receive_message: (dataObject: {message: string, sessionId: string, type: string, userId: string}) => void;
 }
 
 interface ClientToServerEvents {
@@ -18,6 +18,7 @@ interface ChatMessageInterface {
     message: string,
     sessionId: string,
     type: string,
+    userId: string,
 }
 
 interface ChatPropsInterface {
@@ -48,7 +49,7 @@ export default function Chat(props: ChatPropsInterface){
     function sendMessage(message: string) {
         const type = "outgoing"
         socket.emit("send_message", {message, sessionId, type, userId})
-        setMessageLog((previous) => [...previous, {message, sessionId, type}]) 
+        setMessageLog((previous) => [...previous, {message, sessionId, type, userId}]) 
     }
 
     return(

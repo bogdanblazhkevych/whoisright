@@ -41,3 +41,20 @@
     text-align: left;
     border-radius: 20px 20px 0px 20px;
 }
+
+.sender{
+    color: #939393;
+    font-size: 50%;
+}
+
+.senderincomming{
+    text-align: left;
+}
+
+.senderoutgoing{
+    text-align: right;
+}
+
+.sendermediator{
+    text-align: left;
+}
