@@ -5,11 +5,11 @@ import chatcss from "./chat.module.css"
 import { io, Socket } from "socket.io-client";
 
 interface ServerToClientEvents {
-  receive_message: (dataObject: {message: string, sessionId: string, type: string}) => void;
+  receive_message: (dataObject: {message: string, sessionId: string, type: string, userId: string}) => void;
 }
 
 interface ClientToServerEvents {
-  send_message: (dataObject: {message: string, sessionId: string, type: string}) => void;
+  send_message: (dataObject: {message: string, sessionId: string, type: string, userId: string}) => void;
   join_room: (sessionId: string) => void;
 }
 
@@ -17,18 +17,20 @@ interface ChatMessageInterface {
     // sender: string;
     message: string,
     sessionId: string,
-    type: string
+    type: string,
+    userId: string,
 }
 
 interface ChatPropsInterface {
-    sessionId: string
+    sessionId: string,
+    userId: string
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://192.168.1.9:8000');
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.3:8000`);
 
 export default function Chat(props: ChatPropsInterface){
 
-    const { sessionId } = props;
+    const { sessionId, userId } = props;
 
     const [messageLog, setMessageLog] = useState<ChatMessageInterface[]>([]);
 
@@ -46,8 +48,8 @@ export default function Chat(props: ChatPropsInterface){
 
     function sendMessage(message: string) {
         const type = "outgoing"
-        socket.emit("send_message", {message, sessionId, type})
-        setMessageLog((previous) => [...previous, {message, sessionId, type}]) 
+        socket.emit("send_message", {message, sessionId, type, userId})
+        setMessageLog((previous) => [...previous, {message, sessionId, type, userId}]) 
     }
 
     return(
