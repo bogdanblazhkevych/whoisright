@@ -7,7 +7,18 @@
     padding-bottom: env(safe-area-inset-bottom);
 }
 
+.typefield{
+    width: 60%;
+}
+
 .inputelement{
+    width: 100%;
+    overflow: hidden;
+    /* max-height: 50px; */
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    -ms-user-drag: none;
+    resize: none; 
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -15,10 +26,14 @@
     box-shadow: none;
     box-sizing: border-box;
     border-radius: 20px;
-    padding: 8px 15px;
     border: 2px solid #4C4C4C;
     background-color: #1E1E1E;
     color: white;
+    resize: none; 
+    font-size: 1rem;
+    padding: 8px 15px;
+    padding-right: 35px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 .inputelement:focus{
@@ -27,7 +42,6 @@
     appearance: none;
     outline: none;
     box-shadow: none;
-    /* border: none; */
 }
 
 .inputelement:active{
@@ -39,8 +53,16 @@
     /* border: none; */
 }
 
+.typefield{
+    align-self: flex-end;
+}
+
 .sendbutton{
     position: relative;
+    height: 100%;
+    display: flex;
+    padding-bottom: 15px;
+    /* align-self: flex-end; */
 }
 
 .arrowicon{
@@ -48,17 +70,8 @@
     box-sizing: border-box;
     border-radius: 50%;
     color: #148AFF;
-    font-size: 27px;
+    font-size: 2rem;
     display: flex;
-    transform: translate(-31px, 0%);
-    /* top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); */
-    /* transform: translate(-50%, -50%) */
-    /* font-size: 27px; */
+    transform: translate(-2.2rem, -1px);
+    align-self: flex-end;
 }
-/* .arrowicon::after{
-    background-color: azure;
-    width: 50px;
-    height: 50px;
-} */

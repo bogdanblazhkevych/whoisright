@@ -21,7 +21,6 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    //   origin: "http://localhost:3000",
     origin: `http://192.168.1.3:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
@@ -47,7 +46,6 @@ const io = new Server(server, {
 //                 userId: "998654",
 //                 message: "you stole my code"
 //             },
-
 //             {
 //                 userId: "556795",
 //                 message: "you stole it from WDS"
@@ -59,13 +57,7 @@ const io = new Server(server, {
 const chatRooms = {}
 
 function createStringMessageLog(messageLog) {
-    let string = ''
-
-    messageLog.map((message) => {
-        string += `${message.userId}: ${message.message}: `
-    })
-
-    return string
+    return messageLog.map(message => `${message.userId}: ${message.message}`).join(': ');
 }
 
 async function getVerdict(messageLog) {
@@ -90,36 +82,36 @@ async function getVerdict(messageLog) {
 io.on('connection', (socket) => {
 
     socket.on("join_room", (sessionId) => {
-        console.log(`joined room ${sessionId}`)
         socket.join(sessionId)
     })
 
     socket.on("send_message", (messageData) => {
-        
-        let updatedMessageData = {...messageData};
-        updatedMessageData.type = "incomming";
-        socket.to(messageData.sessionId).emit('receive_message', updatedMessageData);
+        let { message, sessionId, userId } = messageData;
+        let messagesContainer = chatRooms[sessionId].messages;
+        let updatedMessageData = {message, sessionId, userId, type: "incomming"};
 
-        let messageLog = {
-            userId: messageData.userId,
-            message: messageData.message
+        socket.to(sessionId).emit('receive_message', updatedMessageData);
+
+        let messageNode = {
+            userId: userId,
+            message: message
         };
 
-        chatRooms[messageData.sessionId].messages.push(messageLog);
-        console.log(chatRooms[messageData.sessionId].messages);
+        messagesContainer.push(messageNode);
+        console.log(messagesContainer);
 
-        if (chatRooms[messageData.sessionId].messages.length === 2) {
-            getVerdict(chatRooms[messageData.sessionId].messages)
+        if (messagesContainer.length === 2) {
+            getVerdict(messagesContainer)
             .then((verdict) => {
                 let verdictMessageData = {
                     message: verdict,
-                    sessionId: messageData.sessionId,
-                    type: 'incomming',
+                    sessionId: sessionId,
+                    type: 'mediator',
                     userId: 'Mediator'
                 };
 
-                let userAsocket = chatRooms[messageData.sessionId].userA.socket;
-                userAsocket.to(messageData.sessionId).emit('receive_message', verdictMessageData);
+                let userAsocket = chatRooms[sessionId].userA.socket;
+                userAsocket.to(sessionId).emit('receive_message', verdictMessageData);
             })
             .catch((error) => {
                 console.error(error);

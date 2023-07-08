@@ -2,10 +2,11 @@ import React, {useEffect, useState} from "react";
 import joincss from "./join.module.css"
 import { io, Socket } from "socket.io-client";
 import { join } from "path";
+import { CodeFixAction } from "typescript";
 
 interface ServerToClientEvents {
   code_generated: (a: string) => void;
-  all_users_validated: () => void;
+  all_users_validated: (a: string) => void;
 }
 
 interface ClientToServerEvents {
@@ -18,13 +19,15 @@ interface JoinPropsInterface {
     setCurrentDisplay: (a: string) => void;
     sessionId: string;
     setSessionId: (a: string) => void;
+    setUserId: (a: string) => void;
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://192.168.1.9:8000');
+// const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://192.168.1.9:8000');
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.3:8000`);
 
 export default function Join(props: JoinPropsInterface){
 
-    const { setCurrentDisplay, sessionId, setSessionId } = props
+    const { setCurrentDisplay, sessionId, setSessionId, setUserId } = props
 
     const [currentJoinDisplay, setCurrentJoinDisplay] = useState('chose')
     const [codeInput, setCodeInput] = useState('')
@@ -65,7 +68,8 @@ export default function Join(props: JoinPropsInterface){
             setCurrentJoinDisplay("show-code")
         })
 
-        socket.on("all_users_validated", () => {
+        socket.on("all_users_validated", (userId) => {
+            setUserId(userId)
             setIsValidated(true)
         })
     }, [socket])

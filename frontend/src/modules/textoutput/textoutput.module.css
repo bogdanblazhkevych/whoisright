@@ -23,6 +23,15 @@
     color: #E1E1E3;
     align-self: flex-start;
     text-align: left;
+    border-radius: 20px 20px 20px 0px;
+}
+
+.mediator{
+    background-color: #362d3b;
+    color: #E1E1E3;
+    align-self: flex-start;
+    text-align: left;
+    border-radius: 20px 20px 20px 0px;
 }
 
 .outgoing{
@@ -30,4 +39,5 @@
     background-color: #148AFF;
     align-self: flex-end;
     text-align: left;
+    border-radius: 20px 20px 0px 20px;
 }
