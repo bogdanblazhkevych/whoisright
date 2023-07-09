@@ -69,6 +69,7 @@
     right: 2px;
     display: flex;
     transform: scale(1);
+    height: calc(100% - 8px);
 }
 
 .arrowicon{
@@ -77,5 +78,6 @@
     border-radius: 50%;
     color: #148AFF;
     font-size: 2rem;
+    align-self: flex-end;
     display: flex;
 }
