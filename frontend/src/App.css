@@ -11,6 +11,18 @@
   /* min-height: -webkit-fill-available; */
 }
 
+html{
+  background-color: #1E1E1E;
+}
+
+body{
+  background-color: #1E1E1E;
+}
+
+#root{
+  background-color: #1E1E1E;
+}
+
 @media only screen and (max-width: 800px){
   .App{
     min-height: 100vh;
