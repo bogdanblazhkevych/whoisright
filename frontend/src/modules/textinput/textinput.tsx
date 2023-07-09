@@ -1,14 +1,13 @@
 import React, { useState, useRef } from "react";
-import textcss from "./textinput.module.css"
 import { BsFillArrowUpRightCircleFill } from 'react-icons/bs';
-import { text } from "stream/consumers";
+import textcss from "./textinput.module.css"
 
 interface Textinputprops {
     sendMessage: (message: string) => void;
 }
 
 export default function Textinput(props: Textinputprops){
-    const {sendMessage} = props;
+    const { sendMessage } = props;
     const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
     const [message, setMessage] = useState('')
@@ -22,12 +21,13 @@ export default function Textinput(props: Textinputprops){
             const { paddingTop, paddingBottom } = getComputedStyle(textArea);
             const textAreaPadding = parseInt(paddingTop) + parseInt(paddingBottom);
 
-            const singleRowHeight = textArea.clientHeight - textAreaPadding;
+            const singleRowHeight = textArea.clientHeight - textAreaPadding - 1;
             const currentRowHeight = textArea.scrollHeight - textAreaPadding;
-
+            
             const rowCount = Math.round(currentRowHeight / singleRowHeight);
 
             textArea.rows = rowCount;
+            console.log(`row count    ${rowCount}`)
         }
     }
 
@@ -40,6 +40,9 @@ export default function Textinput(props: Textinputprops){
         if (e.key === 'Enter') {
             e.preventDefault()
             sendMessage(message)
+            if(textAreaRef.current) {
+                textAreaRef.current.rows = 1
+            }
             setMessage('')
         }
     }
