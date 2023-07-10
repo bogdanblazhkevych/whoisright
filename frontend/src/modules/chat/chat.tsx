@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import Textinput from "../textinput/textinput";
+import React, { useState, useEffect, useRef } from "react";
+import TextInput from "../textinput/textinput";
 import Textoutput from "../textoutput/textoutput";
 import chatcss from "./chat.module.css"
 import { io, Socket } from "socket.io-client";
@@ -29,7 +29,6 @@ interface ChatPropsInterface {
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.6:8000`);
 
 export default function Chat(props: ChatPropsInterface){
-
     const { sessionId, userId } = props;
 
     const [messageLog, setMessageLog] = useState<ChatMessageInterface[]>([]);
@@ -55,7 +54,7 @@ export default function Chat(props: ChatPropsInterface){
     return(
         <div className={chatcss.chatwrapper}>
             <Textoutput messageLog={messageLog}/>
-            <Textinput sendMessage={sendMessage}/>
+            <TextInput sendMessage={sendMessage}/>
         </div>
     )
 }

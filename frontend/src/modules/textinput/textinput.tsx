@@ -2,14 +2,13 @@ import React, { useState, useRef } from "react";
 import { BsFillArrowUpRightCircleFill } from 'react-icons/bs';
 import textcss from "./textinput.module.css"
 
-interface Textinputprops {
+interface TextInputPropsInterface {
     sendMessage: (message: string) => void;
 }
 
-export default function Textinput(props: Textinputprops){
+export default function TextInput(props: TextInputPropsInterface){
     const { sendMessage } = props;
     const textAreaRef = useRef<HTMLTextAreaElement>(null)
-
     const [message, setMessage] = useState('')
 
     function setDynamicInputHeight(){
@@ -39,17 +38,22 @@ export default function Textinput(props: Textinputprops){
     function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>):void {
         if (e.key === 'Enter') {
             e.preventDefault()
-            sendMessage(message)
-            if(textAreaRef.current) {
-                textAreaRef.current.rows = 1
-            }
-            setMessage('')
+            sendMessageWrapper()
         }
     }
 
     function handleClick() {
-        sendMessage(message);
-        setMessage('');
+        sendMessageWrapper()
+    }
+
+    function sendMessageWrapper(){
+        const textArea = textAreaRef.current;
+
+        if (textArea) {
+            textArea.rows = 1;
+            sendMessage(message);
+            setMessage('')
+        }
     }
 
     return(
