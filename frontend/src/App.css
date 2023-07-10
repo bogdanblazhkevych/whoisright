@@ -7,8 +7,6 @@
   box-sizing: border-box;
   min-height: 100vh;
   background-color: #1E1E1E;
-  /* min-height: fill-available; */
-  /* min-height: -webkit-fill-available; */
 }
 
 html{
@@ -23,7 +21,7 @@ body{
   background-color: #1E1E1E;
 }
 
-@media only screen and (max-width: 800px){
+@media only screen and (max-width: 700px){
   .App{
     min-height: 100vh;
     min-height: fill-available;
@@ -32,7 +30,6 @@ body{
 
 }
 
-/* For WebKit-based browsers */
 .App::-webkit-scrollbar {
   width: 0.5em;
 }
@@ -41,7 +38,6 @@ body{
   background-color: transparent;
 }
 
-/* For Firefox */
 .App {
   scrollbar-width: none;
 }
