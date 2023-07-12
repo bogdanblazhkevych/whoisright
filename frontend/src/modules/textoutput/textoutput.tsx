@@ -30,7 +30,6 @@ export default function Textoutput(props: TextoutputInterface){
                 return (
                     <>
                         <div key={index} className={`${textoutputcss.message} ${textoutputcss[chatMessage.type]}`}>{chatMessage.message}</div>
-                        {/* <div key={`${index}sender`} className={`${textoutputcss.sender} ${textoutputcss[`sender${chatMessage.type}`]}`}>{chatMessage.userId}</div> */}
                         {chatMessage.userId != messageLog[index + 1]?.userId && <div key={`${index}sender`} className={`${textoutputcss.sender} ${textoutputcss[`sender${chatMessage.type}`]}`}>{chatMessage.userId}</div>}
                     </>
                 )
