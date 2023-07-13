@@ -36,7 +36,7 @@ function App() {
   return (
     <div className="App">
 
-      {currentDisplay === "find-session" && <Join setCurrentDisplay={setCurrentDisplay} sessionId={sessionId} setSessionId={setSessionId} setUserId={setUserId} chatData={chatData} setChatData={setChatData}/>}
+      {currentDisplay === "find-session" && <Join setCurrentDisplay={setCurrentDisplay} chatData={chatData}setChatData={setChatData}/>}
       {/* <Join /> */}
       {currentDisplay === "chatroom" && <Chat chatData={chatData}/>}
     </div>

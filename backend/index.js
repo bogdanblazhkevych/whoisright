@@ -5,7 +5,6 @@ import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from 'openai';
-import { checkServerIdentity } from 'tls';
 
 dotenv.config();
 
@@ -31,23 +30,27 @@ const io = new Server(server, {
 // chatRooms = {
 //     A6B78H: {
 //         connectedUsers: 2,
-//         userA: {
+//         host: {
 //             validated: true,
 //             socket: "socket object",
-//             userID: "556795"
+//             userID: "556795",
+//             displayName: 'cody'
 //         },
-//         userB: {
+//         guest: {
 //             validated: true,
 //             socket: "socket object",
-//             userID: "998654"
+//             userID: "998654",
+//             displayName: 'randy'
 //         },
 //         messages: [
 //             {
 //                 userId: "998654",
+//                 displayName: 'randy',
 //                 message: "you stole my code"
 //             },
 //             {
 //                 userId: "556795",
+//                 displayName: 'cody',
 //                 message: "you stole it from WDS"
 //             }
 //         ]
@@ -57,7 +60,7 @@ const io = new Server(server, {
 const chatRooms = {}
 
 function createStringMessageLog(messageLog) {
-    return messageLog.map(message => `${message.userId}: ${message.message}`).join(': ');
+    return messageLog.map(message => `${message.displayName}: ${message.message}`).join(': ');
 }
 
 async function getVerdict(messageLog) {
@@ -89,15 +92,16 @@ io.on('connection', (socket) => {
     })
 
     socket.on("send_message", (messageData) => {
-        let { message, sessionId, userId } = messageData;
+        let { message, sessionId, userId, displayName } = messageData;
         let messagesContainer = chatRooms[sessionId].messages;
-        let updatedMessageData = {message, sessionId, userId, type: "incomming"};
+        let updatedMessageData = {message, sessionId, userId, type: "incomming", displayName};
 
         socket.to(sessionId).emit('receive_message', updatedMessageData);
 
         let messageNode = {
             userId: userId,
-            message: message
+            message: message,
+            displayName: displayName
         };
 
         messagesContainer.push(messageNode);
@@ -110,7 +114,8 @@ io.on('connection', (socket) => {
                     message: verdict,
                     sessionId: sessionId,
                     type: 'mediator',
-                    userId: 'Mediator'
+                    userId: 'Mediator',
+                    displayName: 'Mediator'
                 };
 
                 let hostSocket = chatRooms[sessionId].host.socket;

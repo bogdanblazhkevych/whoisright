@@ -14,9 +14,6 @@ interface ClientToServerEvents {
 
 interface JoinPropsInterface {
     setCurrentDisplay: (a: string) => void;
-    sessionId: string;
-    setSessionId: (a: string) => void;
-    setUserId: (a: string) => void;
     chatData: ChatDataInterface;
     setChatData: (chatData: ChatDataInterface) => void;
 }
@@ -34,17 +31,15 @@ interface ChatDataInterface {
     }
   }
 
-// const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://192.168.1.9:8000');
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://172.20.10.2:8000`);
 
 export default function Join(props: JoinPropsInterface){
 
-    const { setCurrentDisplay, sessionId, setSessionId, setUserId, chatData, setChatData } = props
+    const { setCurrentDisplay, setChatData, chatData } = props
 
     const [currentJoinDisplay, setCurrentJoinDisplay] = useState('chose')
     const [displayName, setDisplayName] = useState('')
     const [codeInput, setCodeInput] = useState('')
-    const [isValidated, setIsValidated] = useState(false)
 
     function createSession(){
         if (displayName.length === 0) {
@@ -60,7 +55,7 @@ export default function Join(props: JoinPropsInterface){
         setCurrentJoinDisplay('enter-code')
     }
 
-    function handleInputChange(e: React.ChangeEvent<HTMLInputElement>):void {
+    function handleCodeInputChange(e: React.ChangeEvent<HTMLInputElement>):void {
         let codeInputUpperCase = e.target.value.toUpperCase()
         setCodeInput(codeInputUpperCase)
     }
@@ -76,27 +71,15 @@ export default function Join(props: JoinPropsInterface){
         }
     }
 
-    // useEffect(() => {
-    //     console.log("using validerated effect")
-    //     if (isValidated) {
-    //         if (currentJoinDisplay === "enter-code") {
-    //             setSessionId(codeInput)
-    //         }
-    //         setCurrentDisplay("chatroom")
-    //     }
-    // }, [isValidated])
-
     useEffect(() => {
         socket.on("code_generated", (code) => {
-            setSessionId(code)
+            setChatData({...chatData, sessionId: code})
             setCurrentJoinDisplay("show-code")
         })
 
         socket.on("all_users_validated", (chatData) => {
             setChatData(chatData)
             setCurrentDisplay('chatroom')
-            // setUserId(userId)
-            // setIsValidated(true)
         })
     }, [socket])
 
@@ -118,13 +101,13 @@ export default function Join(props: JoinPropsInterface){
             {currentJoinDisplay === "show-code" && 
                 <>
                     <div className={joincss.sessionId}>
-                        {sessionId}
+                        {chatData.sessionId}
                     </div>
                 </>
             }
             {currentJoinDisplay === "enter-code" && 
                 <>
-                    <input className={joincss.codeinput} onChange={handleInputChange} onKeyDown={handleKeyDown} value={codeInput}></input>
+                    <input className={joincss.codeinput} onChange={handleCodeInputChange} onKeyDown={handleKeyDown} value={codeInput}></input>
                 </>
             }
         </div>
