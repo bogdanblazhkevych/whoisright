@@ -21,16 +21,33 @@ interface ChatMessageInterface {
     userId: string,
 }
 
-interface ChatPropsInterface {
-    sessionId: string,
+interface ChatDataUserObjectInterface {
+    [key: string]: string,
+    displayName: string,
     userId: string
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.6:8000`);
+interface ChatPropsInterface {
+    chatData: {
+        sessionId: string,
+        role: string,
+        host: {
+          displayName: string,
+          userId: string
+        }
+        guest: {
+          displayName: string,
+          userId: string
+        }
+    }
+}
+
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://172.20.10.2:8000`);
 
 export default function Chat(props: ChatPropsInterface){
-    const { sessionId, userId } = props;
-
+    const { chatData } = props;
+    const sessionId = chatData.sessionId;
+    const userId = chatData.role === 'host' ? chatData.host.userId : chatData.guest.userId
     const [messageLog, setMessageLog] = useState<ChatMessageInterface[]>([]);
 
     useEffect(() => {

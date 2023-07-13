@@ -5,21 +5,32 @@ import Join from './modules/join/join';
 
 interface ChatDataInterface {
   sessionId: string,
-  userId: string,
-  recipiantDisplayName: string,
-  senderDisplayName: string
+  role: string,
+  host: {
+    displayName: string,
+    userId: string
+  }
+  guest: {
+    displayName: string,
+    userId: string
+  }
 }
 
 function App() {
   const [currentDisplay, setCurrentDisplay] = useState('find-session');
   const [sessionId, setSessionId] = useState('');
   const [userId, setUserId] = useState('');
-
   const [chatData, setChatData] = useState<ChatDataInterface>({
     sessionId: 'sessionId',
-    userId: 'userId',
-    recipiantDisplayName: 'name',
-    senderDisplayName: 'name'
+    role: 'role',
+    host: {
+      displayName: 'name',
+      userId: 'userId'
+    },
+    guest: {
+      displayName: 'name',
+      userId: 'userId'
+    }
   })
 
   return (
@@ -27,7 +38,7 @@ function App() {
 
       {currentDisplay === "find-session" && <Join setCurrentDisplay={setCurrentDisplay} sessionId={sessionId} setSessionId={setSessionId} setUserId={setUserId} chatData={chatData} setChatData={setChatData}/>}
       {/* <Join /> */}
-      {currentDisplay === "chatroom" && <Chat sessionId={sessionId} userId={userId}/>}
+      {currentDisplay === "chatroom" && <Chat chatData={chatData}/>}
     </div>
   );
 }

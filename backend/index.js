@@ -21,7 +21,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://192.168.1.6:3000`,
+    origin: `http://172.20.10.2:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -113,8 +113,8 @@ io.on('connection', (socket) => {
                     userId: 'Mediator'
                 };
 
-                let userAsocket = chatRooms[sessionId].userA.socket;
-                userAsocket.to(sessionId).emit('receive_message', verdictMessageData);
+                let hostSocket = chatRooms[sessionId].host.socket;
+                hostSocket.to(sessionId).emit('receive_message', verdictMessageData);
             })
             .catch((error) => {
                 console.error(error);
@@ -122,21 +122,23 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on("generate_code", () => {
+    socket.on("generate_code", (displayName) => {
         const code = generateCode();
-        const userAID = generateCode();
+        const userId = generateCode();
 
         chatRooms[code] = {
             connectedUsers: 1,
-            userA: {
+            host: {
                 validated: true,
                 socket: socket,
-                userID: userAID
+                userId: userId,
+                displayName: displayName
             },
-            userB: {
+            guest: {
                 validated: false,
                 socket: null,
-                userID: null
+                userId: null,
+                displayName: null
             },
             messages: []
         };
@@ -144,20 +146,34 @@ io.on('connection', (socket) => {
         socket.emit('code_generated', code);
     })
 
-    socket.on("validate_code", (code) => {
+    socket.on("validate_code", (code, displayName) => {
         if (chatRooms[code]) {
 
             if (chatRooms[code].connectedUsers === 1) {
-                const userBID = generateCode();
+                const userId = generateCode();
 
                 chatRooms[code].connectedUsers = 2;
-                chatRooms[code].userB.validated = true;
-                chatRooms[code].userB.socket = socket;
-                chatRooms[code].userB.userID = userBID;
+                chatRooms[code].guest.validated = true;
+                chatRooms[code].guest.socket = socket;
+                chatRooms[code].guest.userId = userId;
+                chatRooms[code].guest.displayName = displayName
 
-                if (chatRooms[code].userA.validated && chatRooms[code].userB.validated) {
-                    chatRooms[code].userA.socket.emit("all_users_validated", chatRooms[code].userA.userID)
-                    chatRooms[code].userB.socket.emit("all_users_validated", chatRooms[code].userB.userID)
+                if (chatRooms[code].host.validated && chatRooms[code].guest.validated) {
+                    const chatData = {
+                        role: 'host',
+                        sessionId: code,
+                        host: {
+                            displayName: chatRooms[code].host.displayName,
+                            userId: chatRooms[code].host.userId
+                        },
+                        guest: {
+                            displayName: chatRooms[code].guest.displayName,
+                            userId: chatRooms[code].guest.userId
+                        }
+                    }
+                    console.log({...chatData, role: 'host'})
+                    chatRooms[code].host.socket.emit("all_users_validated", {...chatData, role: 'host'})
+                    chatRooms[code].guest.socket.emit("all_users_validated", {...chatData, role: 'guest'})
                 }
             }
         }

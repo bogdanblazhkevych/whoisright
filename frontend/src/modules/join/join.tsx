@@ -4,7 +4,7 @@ import { io, Socket } from "socket.io-client";
 
 interface ServerToClientEvents {
   code_generated: (a: string) => void;
-  all_users_validated: (a: string) => void;
+  all_users_validated: (chatData: ChatDataInterface) => void;
 }
 
 interface ClientToServerEvents {
@@ -23,13 +23,19 @@ interface JoinPropsInterface {
 
 interface ChatDataInterface {
     sessionId: string,
-    userId: string,
-    recipiantDisplayName: string,
-    senderDisplayName: string
+    role: string,
+    host: {
+      displayName: string,
+      userId: string
+    }
+    guest: {
+      displayName: string,
+      userId: string
+    }
   }
 
 // const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://192.168.1.9:8000');
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.6:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://172.20.10.2:8000`);
 
 export default function Join(props: JoinPropsInterface){
 
@@ -70,15 +76,15 @@ export default function Join(props: JoinPropsInterface){
         }
     }
 
-    useEffect(() => {
-        console.log("using validerated effect")
-        if (isValidated) {
-            if (currentJoinDisplay === "enter-code") {
-                setSessionId(codeInput)
-            }
-            setCurrentDisplay("chatroom")
-        }
-    }, [isValidated])
+    // useEffect(() => {
+    //     console.log("using validerated effect")
+    //     if (isValidated) {
+    //         if (currentJoinDisplay === "enter-code") {
+    //             setSessionId(codeInput)
+    //         }
+    //         setCurrentDisplay("chatroom")
+    //     }
+    // }, [isValidated])
 
     useEffect(() => {
         socket.on("code_generated", (code) => {
@@ -86,9 +92,11 @@ export default function Join(props: JoinPropsInterface){
             setCurrentJoinDisplay("show-code")
         })
 
-        socket.on("all_users_validated", (userId) => {
-            setUserId(userId)
-            setIsValidated(true)
+        socket.on("all_users_validated", (chatData) => {
+            setChatData(chatData)
+            setCurrentDisplay('chatroom')
+            // setUserId(userId)
+            // setIsValidated(true)
         })
     }, [socket])
 
