@@ -1,10 +1,35 @@
 import React from "react";
 import chatdetailscss from './chatdetails.module.css'
 
-export default function ChatDetails(){
+interface ChatDetailsPropsInterface {
+    chatData: {
+        sessionId: string,
+        role: string,
+        host: {
+          displayName: string,
+          userId: string
+        }
+        guest: {
+          displayName: string,
+          userId: string
+        }
+    }
+}
+
+export default function ChatDetails(props: ChatDetailsPropsInterface){
+    const { chatData } = props
+
     return(
         <div className={chatdetailscss.chatdetailswrapper}>
-            
+            <div className={chatdetailscss.usericon}>
+                {chatData.host.displayName[0].toUpperCase()}
+            </div>
+            <div className={`${chatdetailscss.usericon} ${chatdetailscss.usericonmediator}`}>
+                M
+            </div>
+            <div className={chatdetailscss.usericon}>
+                {chatData.guest.displayName[0].toUpperCase()}
+            </div>
         </div>
     )
 }

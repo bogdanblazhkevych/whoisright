@@ -3,6 +3,7 @@ import TextInput from "../textinput/textinput";
 import Textoutput from "../textoutput/textoutput";
 import chatcss from "./chat.module.css"
 import { io, Socket } from "socket.io-client";
+import ChatDetails from "../chatdetails/chatdetails";
 
 interface ServerToClientEvents {
   receive_message: (dataObject: {message: string, sessionId: string, type: string, userId: string, displayName: string}) => void;
@@ -37,7 +38,7 @@ interface ChatPropsInterface {
     }
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://172.20.10.2:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://10.13.3.192:8000`);
 
 export default function Chat(props: ChatPropsInterface){
     const { chatData } = props;
@@ -62,6 +63,7 @@ export default function Chat(props: ChatPropsInterface){
 
     return(
         <div className={chatcss.chatwrapper}>
+            <ChatDetails chatData={chatData}/>
             <Textoutput messageLog={messageLog}/>
             <TextInput sendMessage={sendMessage}/>
         </div>

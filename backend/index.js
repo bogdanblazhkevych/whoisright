@@ -20,7 +20,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://172.20.10.2:3000`,
+    origin: `http://10.13.3.192:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -58,6 +58,10 @@ const io = new Server(server, {
 // }
 
 const chatRooms = {}
+
+function generateCode() {
+    return crypto.randomBytes(3).toString('hex').toUpperCase()
+}
 
 function createStringMessageLog(messageLog) {
     return messageLog.map(message => `${message.displayName}: ${message.message}`).join(': ');
@@ -184,10 +188,6 @@ io.on('connection', (socket) => {
         }
     })
 });
-
-function generateCode() {
-    return crypto.randomBytes(3).toString('hex').toUpperCase()
-}
 
 const port = process.env.PORT || 8000;
 
