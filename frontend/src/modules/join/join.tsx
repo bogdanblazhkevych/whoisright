@@ -31,7 +31,7 @@ interface ChatDataInterface {
     }
   }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://10.13.3.192:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://10.13.1.176:8000`);
 
 export default function Join(props: JoinPropsInterface){
 

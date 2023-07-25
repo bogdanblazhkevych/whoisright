@@ -38,7 +38,7 @@ interface ChatPropsInterface {
     }
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://10.13.3.192:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://10.13.1.176:8000`);
 
 export default function Chat(props: ChatPropsInterface){
     const { chatData } = props;
