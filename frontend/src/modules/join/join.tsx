@@ -31,7 +31,7 @@ interface ChatDataInterface {
     }
   }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://10.13.1.176:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.9:8000`);
 
 export default function Join(props: JoinPropsInterface){
 
@@ -86,17 +86,43 @@ export default function Join(props: JoinPropsInterface){
     return(
         <div className={joincss.joinwrapper}>
             {currentJoinDisplay === "chose" &&
-                <>  
-                    <input className={joincss.codeinput} onChange={handleDisplayNameInput} value={displayName}></input>
-                    <div className={joincss.chosebuttonwrapper}>
-                        <div className={joincss.divbutton} onClick={createSession}>
-                            Create <br></br> Session
+                <div className={joincss.chosewrapper}>  
+                    <div className={joincss.textwrapper}>
+                        <div className={joincss.heading}>
+                            ARBITRATOR.AI
                         </div>
-                        <div className={joincss.divbutton} onClick={joinSession}>
-                            Join <br></br> Session
+                        {/* <div className={joincss.body}>
+                        Welcome to Arbitrator.ai, the cutting-edge platform where all kinds of disputes find meaningful resolutions through arbitration powered by the latest Ai technology. Enter a chat room with your opposing party and begin discussing your dispute. You will be joined by an Ai arbitrator who will moderate the discussion and ultimately propose a resolution.  
+                        </div> */}
+                        {/* <div className={joincss.body}>
+                        Enter a chat room with your opposing party and begin discussing your dispute. You will be joined by an Ai arbitrator who will moderate the discussion and ultimately propose a resolution.  
+                        </div> */}
+                        <div className={joincss.body}>
+                        Ai driven conflict resolution
+                        </div>
+                        <div className={joincss.body}>
+                        Get started by entering your name in the input field.
+                        </div>
+                        <div className={joincss.body}>
+                        Select <span style={{color: "#E1E1E3", fontWeight: 800}}>Create Session</span> to create a chat room. Relay the generated session code to the opposing party.
+                        </div>
+                        <div className={joincss.body}>
+                        Select <span style={{color: "#E1E1E3", fontWeight: 800}}>Join Session</span> if you have received a session code to be connected with the opposing party.
                         </div>
                     </div>
-                </>
+
+                    <div className={joincss.inputwrapper}>
+                        <input className={joincss.codeinput} onChange={handleDisplayNameInput} value={displayName} placeholder="Display Name"></input>
+                        {/* <div className={joincss.chosebuttonwrapper}> */}
+                        <div className={joincss.divbutton} onClick={createSession}>
+                            Create Session
+                        </div>
+                        <div className={joincss.divbutton} onClick={joinSession}>
+                            Join Session
+                        </div>
+                        {/* </div> */}
+                    </div>
+                </div>
             }
             {currentJoinDisplay === "show-code" && 
                 <>

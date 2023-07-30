@@ -7,6 +7,46 @@
     /* height: 100%; */
     justify-content: center;
     flex-direction: column;
+    align-items: center;
+}
+
+.textwrapper{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    max-width: 800px;
+    font-size: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: min-content;
+}
+
+.heading{
+    font-weight: 800;
+    color:#E1E1E3;
+}  
+
+.body{
+    font-size: 30%;
+    font-weight: 500;
+    text-align: center;
+    color:#9f9fa0;
+    padding-bottom: 1rem;
+
+}
+
+.chosewrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.inputwrapper{
+    display: flex;
+    flex-direction: column;
+    /* width: max-content; */
+    width: 100%;
+    gap: 1rem;
 }
 
 .joinwrapper > button, input {
@@ -15,18 +55,35 @@
 
 .chosebuttonwrapper{
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 1rem;
 }
 
 .sessionId{
     align-self: center;
     color: #E1E1E3;
 }
-
 .divbutton{
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    box-shadow: none;
+    box-sizing: border-box;
+    border-radius: 20px;
+    padding: 8px 15px;
+    border: 2px solid #4C4C4C;
+    background-color: #4C4C4C;
+    color: white;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+}
+
+/* .divbutton{
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     color: #E1E1E3;
-    align-self: center;
     background: rgb(78,78,78);
     background: linear-gradient(0deg, rgba(78,78,78,1) 44%, rgba(109,109,109,1) 100%);
     aspect-ratio: 1 / 1;
@@ -34,9 +91,10 @@
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    padding: 5%;
-    margin: 5%;
-}
+    padding: 1rem;
+    margin-top: 1rem;
+    width: 30%;
+} */
 
 .codeinput{
     appearance: none;
@@ -50,6 +108,9 @@
     border: 2px solid #4C4C4C;
     background-color: #1E1E1E;
     color: white;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
 }
 
 .codeinput:focus{
@@ -69,3 +130,11 @@
     box-shadow: none;
     /* border: none; */
 }
+
+/* @media only screen and (max-width: 700px){
+    .chosewrapper{
+      min-height: fill-available;
+      min-height: -webkit-fill-available;
+    }
+  
+  } */
