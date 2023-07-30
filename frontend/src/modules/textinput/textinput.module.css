@@ -11,7 +11,8 @@
 }
 
 .typefield{
-    width: 60%;
+    /* border: 1px solid green; */
+    width: 90%;
     position: relative;
     display: flex;
     justify-content: center;

@@ -20,7 +20,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://10.13.3.192:3000`,
+    origin: `http://192.168.1.9:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -67,6 +67,17 @@ function createStringMessageLog(messageLog) {
     return messageLog.map(message => `${message.displayName}: ${message.message}`).join(': ');
 }
 
+function createObjectMessageLog(messageLog, primer) {
+    let openAiMessagesArray = [{"role": "system", "content": primer}]
+
+    messageLog.forEach((messageNode) => {
+        let messageObject = {"role": "user", "name": messageNode.displayName, "content": messageNode.message}
+        openAiMessagesArray.push(messageObject)
+    })
+
+    return openAiMessagesArray
+}   
+
 async function getVerdict(messageLog) {
 
     const primer = `You are a conflict mediator. You must analyze these two points of view and 
@@ -80,10 +91,13 @@ async function getVerdict(messageLog) {
     Keep your rulings brief, 15 sentences maximum.`
 
     const chatString = createStringMessageLog(messageLog)
+    const messageArray = createObjectMessageLog(messageLog, primer)
+
+    console.log(messageArray)
 
     const completion = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
-        messages: [{"role": "system", "content": primer}, {role: "user", content: chatString}],
+        messages: messageArray,
     });
 
     return completion.data.choices[0].message.content
@@ -109,8 +123,6 @@ io.on('connection', (socket) => {
         };
 
         messagesContainer.push(messageNode);
-        console.log(messagesContainer);
-
         if (messagesContainer.length === 2) {
             getVerdict(messagesContainer)
             .then((verdict) => {

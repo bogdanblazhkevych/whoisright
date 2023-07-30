@@ -21,14 +21,19 @@ export default function ChatDetails(props: ChatDetailsPropsInterface){
 
     return(
         <div className={chatdetailscss.chatdetailswrapper}>
-            <div className={chatdetailscss.usericon}>
-                {chatData.host.displayName[0].toUpperCase()}
+            <div className={chatdetailscss.iconswrapper}>
+                <div className={chatdetailscss.usericon}>
+                    {chatData.host.displayName[0].toUpperCase()}
+                </div>
+                <div className={`${chatdetailscss.usericon} ${chatdetailscss.usericonmediator}`}>
+                    M
+                </div>
+                <div className={chatdetailscss.usericon}>
+                    {chatData.guest.displayName[0].toUpperCase()}
+                </div>
             </div>
-            <div className={`${chatdetailscss.usericon} ${chatdetailscss.usericonmediator}`}>
-                M
-            </div>
-            <div className={chatdetailscss.usericon}>
-                {chatData.guest.displayName[0].toUpperCase()}
+            <div className={chatdetailscss.sessionid}>
+                {chatData.sessionId}
             </div>
         </div>
     )
