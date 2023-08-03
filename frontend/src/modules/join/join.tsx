@@ -78,6 +78,7 @@ export default function Join(props: JoinPropsInterface){
         })
 
         socket.on("all_users_validated", (chatData) => {
+            console.log(chatData)
             setChatData(chatData)
             setCurrentDisplay('chatroom')
         })

@@ -49,6 +49,7 @@ export default function Chat(props: ChatPropsInterface){
     const [messageLog, setMessageLog] = useState<ChatMessageInterface[]>([]);
 
     useEffect(() => {
+        console.log(sessionId)
         socket.emit('join_room', sessionId)
 
         socket.on('receive_message', (message) => {
