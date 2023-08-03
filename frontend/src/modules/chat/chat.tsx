@@ -61,11 +61,21 @@ export default function Chat(props: ChatPropsInterface){
         setMessageLog((previous) => [...previous, {message, sessionId, type, userId, displayName}]) 
     }
 
+    function didUserSendLastMessage() {
+        if (messageLog.length > 0) {
+            return messageLog[messageLog.length - 1].userId == userId
+        } else {
+            return false
+        }
+    }
+
+    console.log(userId)
+
     return(
         <div className={chatcss.chatwrapper}>
             <ChatDetails chatData={chatData}/>
             <Textoutput messageLog={messageLog}/>
-            <TextInput sendMessage={sendMessage}/>
+            <TextInput sendMessage={sendMessage} didUserSendLastMessage={didUserSendLastMessage}/>
         </div>
     )
 }

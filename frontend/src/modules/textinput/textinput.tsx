@@ -1,13 +1,15 @@
 import React, { useState, useRef } from "react";
 import { BsFillArrowUpRightCircleFill } from 'react-icons/bs';
+import { disposeEmitNodes } from "typescript";
 import textcss from "./textinput.module.css"
 
 interface TextInputPropsInterface {
     sendMessage: (message: string) => void;
+    didUserSendLastMessage: () => boolean;
 }
 
 export default function TextInput(props: TextInputPropsInterface){
-    const { sendMessage } = props;
+    const { sendMessage, didUserSendLastMessage } = props;
     const textAreaRef = useRef<HTMLTextAreaElement>(null)
     const [message, setMessage] = useState('')
 
@@ -31,6 +33,9 @@ export default function TextInput(props: TextInputPropsInterface){
     }
 
     function handleInputChange(e: React.ChangeEvent<HTMLTextAreaElement>):void {
+        if (didUserSendLastMessage()) {
+            return
+        }
         setDynamicInputHeight()
         setMessage(e.target.value)
     }
@@ -49,7 +54,7 @@ export default function TextInput(props: TextInputPropsInterface){
     function sendMessageWrapper(){
         const textArea = textAreaRef.current;
 
-        if (textArea) {
+        if (textArea && message.length > 0) {
             textArea.rows = 1;
             sendMessage(message);
             setMessage('')

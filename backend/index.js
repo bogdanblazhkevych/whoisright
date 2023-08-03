@@ -93,7 +93,7 @@ async function getVerdict(messageLog) {
     const chatString = createStringMessageLog(messageLog)
     const messageArray = createObjectMessageLog(messageLog, primer)
 
-    console.log(messageArray)
+    // console.log(messageArray)
 
     const completion = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
@@ -123,9 +123,12 @@ io.on('connection', (socket) => {
         };
 
         messagesContainer.push(messageNode);
-        if (messagesContainer.length === 2) {
+        console.log("messagesContainer: ", messagesContainer)
+        if (messagesContainer.length % 3 == 0) {
             getVerdict(messagesContainer)
             .then((verdict) => {
+                messagesContainer.push({userId:'system', message: verdict, displayName:'mediator'})
+
                 let verdictMessageData = {
                     message: verdict,
                     sessionId: sessionId,
@@ -161,7 +164,7 @@ io.on('connection', (socket) => {
                 userId: null,
                 displayName: null
             },
-            messages: []
+            messages: [{userId:'system', message: "Hello I am your arbitrator.", displayName:'mediator'}]
         };
 
         socket.emit('code_generated', code);
@@ -192,7 +195,7 @@ io.on('connection', (socket) => {
                             userId: chatRooms[code].guest.userId
                         }
                     }
-                    console.log({...chatData, role: 'host'})
+                    // console.log({...chatData, role: 'host'})
                     chatRooms[code].host.socket.emit("all_users_validated", {...chatData, role: 'host'})
                     chatRooms[code].guest.socket.emit("all_users_validated", {...chatData, role: 'guest'})
                 }
@@ -205,9 +208,9 @@ const port = process.env.PORT || 8000;
 
 app.get('/', function(req, res){
     res.send({connected: true, server: "whoisright backend"})
-    console.log(req)
+    // console.log(req)
 })
 
 server.listen(port, function() {
-    console.log(`server is running on port ${port}`)
+    // console.log(`server is running on port ${port}`)
 })
