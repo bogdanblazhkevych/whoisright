@@ -8,7 +8,6 @@ import { Configuration, OpenAIApi } from 'openai';
 import Room from "./room.js"
 import User from "./user.js"
 
-
 dotenv.config();
 
 const configuration = new Configuration({
@@ -23,7 +22,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://192.168.1.9:3000`,
+    origin: `http://192.168.1.2:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -45,6 +44,20 @@ function createUser(socket, displayName) {
     let userId = generateCode();
     let user = new User(true, socket, userId, displayName)
     return user
+}
+
+function parseMessageDataToServerMessageNode(messageData) {
+    let serverMessageNode = {
+        "role": messageData.displayName == "Mediator" ? "assistant" : "user",
+        "name": messageData.displayName,
+        "content": messageData.message
+    }
+    return serverMessageNode
+}
+
+function parseMessageDataToClientMessageNode(messageData) {
+    let clientMessageNode = {...messageData, type: "incomming"}
+    return clientMessageNode
 }
 
 io.on('connection', (socket) => { 
@@ -87,7 +100,75 @@ io.on('connection', (socket) => {
             }
         }
     })
+
+    socket.on('send_message', (messageData) => {
+        //establish room
+        let room = chatRooms[messageData.sessionId];
+
+        //create server side message node
+        let serverMessageNode = parseMessageDataToServerMessageNode(messageData);
+
+        //create client side message node
+        let clientMessageNode = parseMessageDataToClientMessageNode(messageData);
+
+        //send client message node to client
+        socket.to(room.sessionId).emit('receive_message', clientMessageNode)
+
+        //send server message node to server
+        room.addMessage(serverMessageNode)
+        
+        //implementing ai mediator
+        handleMediatorResponse(room)
+    })  
 })
+
+async function handleMediatorResponse(room) {
+    if (room.messages.length % 3 != 0) {
+        return
+    }
+
+    getMediatorResponse(room.messages)
+    .then((response) => {
+        let serverMessageNode = parseMediatorResponseToServerMessageNode(response);
+        room.addMessage(serverMessageNode)
+        let clientMessageNode = parseMediatorResponseToClientMessageNode(response, room.sessionId);
+        room.users.host.socket.to(room.sessionId).emit('receive_message', clientMessageNode)
+    })
+    .catch((error) => {
+        console.log(error)
+    })
+}
+
+async function getMediatorResponse(messages) {
+    const completion = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: messages,
+    });
+
+    return completion.data.choices[0].message.content
+}
+
+function parseMediatorResponseToServerMessageNode(response) {
+    let serverMessageNode = {
+        role: "assistant",
+        name: "Mediator",
+        content: response
+    }
+
+    return serverMessageNode
+}
+
+function parseMediatorResponseToClientMessageNode(response, sessionId) {
+    let clientMessageNode = {
+        message: response,
+        sessionId: sessionId,
+        type: 'mediator',
+        userId: 'Mediator',
+        displayName: 'Mediator'
+    }
+
+    return clientMessageNode
+}
 
 const port = process.env.PORT || 8000;
 
