@@ -5,6 +5,8 @@ import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from 'openai';
+import Room from "./room.js"
+import User from "./user.js"
 
 dotenv.config();
 
@@ -168,6 +170,22 @@ io.on('connection', (socket) => {
         };
 
         socket.emit('code_generated', code);
+
+        // //trying out oop
+
+        // //creating a room
+        // let testRoomCode = generateCode();
+        // chatRooms[testRoomCode] = new Room(testRoomCode);
+        // let room = chatRooms[testRoomCode];
+
+        // //creating a user
+        // let testUserId = generateCode();
+        // let user = new User(true, socket, testUserId, displayName);
+
+        // //adding user to room
+        // room.addUser('host', user)
+        // console.log(chatRooms[testRoomCode])
+        // console.log(chatRooms[code])
     })
 
     socket.on("validate_code", (code, displayName) => {
@@ -195,7 +213,6 @@ io.on('connection', (socket) => {
                             userId: chatRooms[code].guest.userId
                         }
                     }
-                    // console.log({...chatData, role: 'host'})
                     chatRooms[code].host.socket.emit("all_users_validated", {...chatData, role: 'host'})
                     chatRooms[code].guest.socket.emit("all_users_validated", {...chatData, role: 'guest'})
                 }

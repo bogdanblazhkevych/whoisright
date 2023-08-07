@@ -38,7 +38,7 @@ interface ChatPropsInterface {
     }
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.9:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.2:8000`);
 
 export default function Chat(props: ChatPropsInterface){
     const { chatData } = props;
@@ -49,6 +49,7 @@ export default function Chat(props: ChatPropsInterface){
     const [messageLog, setMessageLog] = useState<ChatMessageInterface[]>([]);
 
     useEffect(() => {
+        console.log(sessionId)
         socket.emit('join_room', sessionId)
 
         socket.on('receive_message', (message) => {
