@@ -22,7 +22,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://192.168.1.2:3000`,
+    origin: `http://10.94.73.170:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -75,7 +75,8 @@ io.on('connection', (socket) => {
 
         //add user to room
         room.addUser('host', user)
-
+        console.log(user)
+        console.log(typeof user)
         //send code to client
         socket.emit('code_generated', room.sessionId); //again, rename to match sessionId naming convention
     })
