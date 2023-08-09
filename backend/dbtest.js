@@ -35,34 +35,12 @@ function generateCode() {
     return crypto.randomBytes(3).toString('hex').toUpperCase()
 }
 
-function createRoom() {
-    let sessionId = generateCode();
-    chatRooms[sessionId] = new Room(sessionId); 
-    return chatRooms[sessionId]
-}
-
 function createUser(socket, displayName) {
     let userId = generateCode();
-    // let user = new User(true, socket, userId, displayName)
-    // return user
     return {
         userId: userId,
         displayName: displayName
     }
-}
-
-function parseMessageDataToServerMessageNode(messageData) {
-    let serverMessageNode = {
-        "role": messageData.displayName == "Mediator" ? "assistant" : "user",
-        "name": messageData.displayName,
-        "content": messageData.message
-    }
-    return serverMessageNode
-}
-
-function parseMessageDataToClientMessageNode(messageData) {
-    let clientMessageNode = {...messageData, type: "incomming"}
-    return clientMessageNode
 }
 
 io.on('connection', (socket) => { 
@@ -72,9 +50,10 @@ io.on('connection', (socket) => {
     })
 
     socket.on('generate_code', (displayName) => { //rename generate code aswell as validate code to something more fitting for the naming convention
+        //STORIES:
+        //As host, init a session with a host user and send session ID to client
+
         //create a room
-        let room = createRoom();
-            //database version
         let sessionId = generateCode()
         createRoomInDatabase(sessionId)
 
@@ -82,104 +61,21 @@ io.on('connection', (socket) => {
         let user = createUser(socket, displayName);
 
         //add user to room
-        room.addUser('host', user)
-            //dtaabase version
         addUserToRoom(sessionId, 'host', user)
 
 
         //send code to client
-        socket.emit('code_generated', room.sessionId); //again, rename to match sessionId naming convention
+        socket.emit('code_generated', sessionId);
     })
 
     socket.on("validate_code", (sessionId, displayName) => {
-        //check if chatroom exists
-
-        if (chatRooms[sessionId]) {
-            let room = chatRooms[sessionId];
-
-            //check if other party is in room
-            if (room.getNumberOfConnectedUsers() == 1) {
-                //create new user
-                let user = createUser(socket, displayName)
-
-                //add user to room
-                room.addUser('guest', user)
-
-                //pass chatroom data to clients
-                room.users.host.socket.emit("all_users_validated", room.getClientData('host'))
-                room.users.guest.socket.emit("all_users_validated", room.getClientData('guest'))
-            }
-        }
+        //TODO: handle guest joining
     })
 
     socket.on('send_message', (messageData) => {
-        //establish room
-        let room = chatRooms[messageData.sessionId];
-
-        //create server side message node
-        let serverMessageNode = parseMessageDataToServerMessageNode(messageData);
-
-        //create client side message node
-        let clientMessageNode = parseMessageDataToClientMessageNode(messageData);
-
-        //send client message node to client
-        socket.to(room.sessionId).emit('receive_message', clientMessageNode)
-
-        //send server message node to server
-        room.addMessage(serverMessageNode)
-        
-        //implementing ai mediator
-        handleMediatorResponse(room)
+        //TODO: handle sending messages
     })  
 })
-
-async function handleMediatorResponse(room) {
-    if (room.messages.length % 3 != 0) {
-        return
-    }
-
-    getMediatorResponse(room.messages)
-    .then((response) => {
-        let serverMessageNode = parseMediatorResponseToServerMessageNode(response);
-        room.addMessage(serverMessageNode)
-        let clientMessageNode = parseMediatorResponseToClientMessageNode(response, room.sessionId);
-        room.users.host.socket.to(room.sessionId).emit('receive_message', clientMessageNode)
-    })
-    .catch((error) => {
-        console.log(error)
-    })
-}
-
-async function getMediatorResponse(messages) {
-    const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: messages,
-    });
-
-    return completion.data.choices[0].message.content
-}
-
-function parseMediatorResponseToServerMessageNode(response) {
-    let serverMessageNode = {
-        role: "assistant",
-        name: "Mediator",
-        content: response
-    }
-
-    return serverMessageNode
-}
-
-function parseMediatorResponseToClientMessageNode(response, sessionId) {
-    let clientMessageNode = {
-        message: response,
-        sessionId: sessionId,
-        type: 'mediator',
-        userId: 'Mediator',
-        displayName: 'Mediator'
-    }
-
-    return clientMessageNode
-}
 
 const port = process.env.PORT || 8000;
 
