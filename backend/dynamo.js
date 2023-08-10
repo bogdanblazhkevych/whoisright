@@ -12,7 +12,6 @@ AWS.config.update({
 const dynamoClient = new AWS.DynamoDB();
 
 const createRoomInDatabase = async (sessionId) => {
-
     const chatRoomDetails = {
         sessionId: sessionId,
         users: {
@@ -52,20 +51,15 @@ const addUserToRoom = async (sessionId, userType, user) => {
             '#userType': userType
         },
         ExpressionAttributeValues: {
-            ':userDetails': {
-                M: {
-                    userId: {"S": user.userId},
-                    displayName: {"S": user.displayName}
-                }
-            }
+            ':userDetails': AWS.DynamoDB.Converter.marshall({user}).user
         }
     };
 
     try {
         const data = await dynamoClient.updateItem(params).promise();
-        console.log('Chatroom updated with guest information:', data);
+        console.log(`Chatroom updated with ${userType} information:`, data);
     } catch (err) {
-        console.error('Error updating chatroom:', err);
+        console.error('Error adding user to chatroom:', err);
     }    
 }
 
@@ -78,6 +72,7 @@ const checkIfRoomExists = async (sessionId) => {
     try {
         const data = await dynamoClient.getItem(params).promise();
         if (data.Item) {
+            // console.log(AWS.DynamoDB.Converter.unmarshall(data.Item))
             console.log("sessionId exists")
             return true
         } else {
@@ -89,12 +84,28 @@ const checkIfRoomExists = async (sessionId) => {
     }
 }
 
-//add user to room
+const getRoomInfo = async (sessionId) => {
+    const params = {
+        TableName: 'chatrooms',
+        Key: {"sessionId": {"S": sessionId}}
+    };
+
+    try {
+        const data = await dynamoClient.getItem(params).promise();
+        const parsedData = AWS.DynamoDB.Converter.unmarshall(data.Item);
+        return parsedData
+    } catch (err) {
+        console.log("error in getRoomData function: ", err)
+    }
+}
+
+
 const dbfunctions = {
     createRoomInDatabase,
     addUserToRoom,
-    checkIfRoomExists
+    checkIfRoomExists,
+    getRoomInfo
 }
 
 export default dbfunctions
-export { createRoomInDatabase, addUserToRoom, checkIfRoomExists }
+export { createRoomInDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo }

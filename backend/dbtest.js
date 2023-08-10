@@ -5,7 +5,7 @@ import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from 'openai';
-import {createRoomInDatabase, addUserToRoom, checkIfRoomExists} from './dynamo.js'
+import {createRoomInDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo} from './dynamo.js'
 
 dotenv.config();
 
@@ -34,9 +34,8 @@ function generateCode() {
 }
 
 function createUser(socket, displayName) {
-    let userId = generateCode();
     return {
-        userId: userId,
+        userId: socket.id,
         displayName: displayName,
     }
 }
@@ -62,12 +61,19 @@ io.on('connection', (socket) => {
     })
 
     socket.on("validate_code", async (sessionId, displayName) => {
-        //TODO: handle guest joining
-
-        //check if given sessionID exists inside db
         try {   
             let roomExists = await checkIfRoomExists(sessionId)
-            console.log(roomExists)
+            if (roomExists) {
+                let user = createUser(socket, displayName);
+
+                await addUserToRoom(sessionId, 'guest', user);
+                const roomInfo = await getRoomInfo(sessionId);
+                const hostClientData = parseRoomInfoToClientData(roomInfo, 'host');
+                const guestClientData = parseRoomInfoToClientData(roomInfo, 'guest');
+                io.to(roomInfo.users.host.userId).emit('all_users_validated', hostClientData)
+                io.to(roomInfo.users.guest.userId).emit('all_users_validated', guestClientData)
+            }
+
         } catch (err) {
             console.log("error at validating code: ", err)
         }
@@ -77,6 +83,21 @@ io.on('connection', (socket) => {
         //TODO: handle sending messages
     })  
 })
+
+const parseRoomInfoToClientData = (roomInfo, role) => {
+    return {
+        role: role,
+        sessionId: roomInfo.sessionId,
+        host: {
+            displayName: roomInfo.users.host.displayName,
+            userId: roomInfo.users.host.userId
+        },
+        guest: {
+            displayName: roomInfo.users.guest.displayName,
+            userId: roomInfo.users.guest.userId
+        }
+    }
+}
 
 const port = process.env.PORT || 8000;
 

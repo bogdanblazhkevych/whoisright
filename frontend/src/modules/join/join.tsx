@@ -75,6 +75,7 @@ export default function Join(props: JoinPropsInterface){
         socket.on("code_generated", (code) => {
             setChatData({...chatData, sessionId: code})
             setCurrentJoinDisplay("show-code")
+            console.log("code generated: ", code)
         })
 
         socket.on("all_users_validated", (chatData) => {
