@@ -31,7 +31,7 @@ interface ChatDataInterface {
     }
   }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.2:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.5:8000`);
 
 export default function Join(props: JoinPropsInterface){
 
@@ -75,6 +75,7 @@ export default function Join(props: JoinPropsInterface){
         socket.on("code_generated", (code) => {
             setChatData({...chatData, sessionId: code})
             setCurrentJoinDisplay("show-code")
+            console.log("code generated: ", code)
         })
 
         socket.on("all_users_validated", (chatData) => {
