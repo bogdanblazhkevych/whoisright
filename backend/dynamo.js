@@ -11,7 +11,6 @@ AWS.config.update({
 
 const dynamoClient = new AWS.DynamoDB();
 
-//create a room inside db
 const createRoomInDatabase = async (sessionId) => {
 
     const chatRoomDetails = {
@@ -34,28 +33,25 @@ const createRoomInDatabase = async (sessionId) => {
         Item: AWS.DynamoDB.Converter.marshall(chatRoomDetails)
     }
 
-    dynamoClient.putItem(params, (err, data) => {
-        if (err) {
-          console.error('Error creating chatroom:', err);
-        } else {
-          console.log('Chatroom created successfully:', data);
-        }
-      });
+    try {
+        const data = await dynamoClient.putItem(params).promise();
+        console.log('Chatroom created sucessfully', data)
+    } catch (err) {
+        console.error('error creating chatroom')
+    }
+
 }
 
-
-
-//add user to room inside db
 const addUserToRoom = async (sessionId, userType, user) => {
     const params = {
         TableName: "chatrooms",
-        Key: { "sessionId": { "S": sessionId } },
+        Key: {"sessionId": {"S": sessionId}},
         UpdateExpression: "SET #users.#userType = :userDetails",
         ExpressionAttributeNames: {
             '#users': 'users',
             '#userType': userType
         },
-        ExpressionAttributeValues : {
+        ExpressionAttributeValues: {
             ':userDetails': {
                 M: {
                     userId: {"S": user.userId},
@@ -73,11 +69,32 @@ const addUserToRoom = async (sessionId, userType, user) => {
     }    
 }
 
+const checkIfRoomExists = async (sessionId) => {
+    const params = {
+        TableName: "chatrooms",
+        Key: {"sessionId": {"S": sessionId}}
+    };
+
+    try {
+        const data = await dynamoClient.getItem(params).promise();
+        if (data.Item) {
+            console.log("sessionId exists")
+            return true
+        } else {
+            console.log("sessionId does not exist")
+            return false
+        }
+    } catch (err) {
+        console.log("error in checkIfRoomExists: ", err)
+    }
+}
+
 //add user to room
 const dbfunctions = {
     createRoomInDatabase,
-    addUserToRoom
+    addUserToRoom,
+    checkIfRoomExists
 }
 
 export default dbfunctions
-export { createRoomInDatabase, addUserToRoom }
+export { createRoomInDatabase, addUserToRoom, checkIfRoomExists }

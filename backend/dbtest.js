@@ -5,9 +5,7 @@ import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from 'openai';
-import Room from "./room.js"
-import User from "./user.js"
-import {createRoomInDatabase, addUserToRoom} from './dynamo.js'
+import {createRoomInDatabase, addUserToRoom, checkIfRoomExists} from './dynamo.js'
 
 dotenv.config();
 
@@ -23,7 +21,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://10.94.73.170:3000`,
+    origin: `http://192.168.1.5:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -39,37 +37,40 @@ function createUser(socket, displayName) {
     let userId = generateCode();
     return {
         userId: userId,
-        displayName: displayName
+        displayName: displayName,
     }
 }
 
 io.on('connection', (socket) => { 
-    socket.on('join_room', (sessionId) => { //rename join_room to macth the sessionId naming convention
-        console.log(sessionId)
+    socket.on('join_room', (sessionId) => {
         socket.join(sessionId)
     })
 
-    socket.on('generate_code', (displayName) => { //rename generate code aswell as validate code to something more fitting for the naming convention
-        //STORIES:
-        //As host, init a session with a host user and send session ID to client
-
-        //create a room
+    socket.on('generate_code', async (displayName) => {
         let sessionId = generateCode()
-        createRoomInDatabase(sessionId)
-
-        //create a user
-        let user = createUser(socket, displayName);
-
-        //add user to room
-        addUserToRoom(sessionId, 'host', user)
-
-
-        //send code to client
-        socket.emit('code_generated', sessionId);
+        try {
+            await createRoomInDatabase(sessionId)
+    
+            let user = createUser(socket, displayName);
+    
+            await addUserToRoom(sessionId, 'host', user)
+    
+            socket.emit('code_generated', sessionId);
+        } catch (err) {
+            console.log("error at generating code", err)
+        }
     })
 
-    socket.on("validate_code", (sessionId, displayName) => {
+    socket.on("validate_code", async (sessionId, displayName) => {
         //TODO: handle guest joining
+
+        //check if given sessionID exists inside db
+        try {   
+            let roomExists = await checkIfRoomExists(sessionId)
+            console.log(roomExists)
+        } catch (err) {
+            console.log("error at validating code: ", err)
+        }
     })
 
     socket.on('send_message', (messageData) => {
