@@ -4,7 +4,7 @@ import chatdetailscss from './chatdetails.module.css'
 interface ChatDetailsPropsInterface {
     chatData: {
         sessionId: string,
-        role: string,
+        // role: string,
         host: {
           displayName: string,
           userId: string
