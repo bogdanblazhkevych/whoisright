@@ -5,7 +5,7 @@ import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from 'openai';
-import {createRoomInDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo} from './dynamo.js'
+import {createRoomInDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom} from './dynamo.js'
 
 dotenv.config();
 
@@ -48,6 +48,7 @@ io.on('connection', (socket) => {
     socket.on('generate_code', async (displayName) => {
         let sessionId = generateCode()
         try {
+            //TODO: change createRoomInDatabase into two seperate functions, createRoom, and addUserToRoom
             await createRoomInDatabase(sessionId)
     
             let user = createUser(socket, displayName);
@@ -64,8 +65,8 @@ io.on('connection', (socket) => {
         try {   
             let roomExists = await checkIfRoomExists(sessionId)
             if (roomExists) {
+                //TODO: clean this up, restructure frontend if needed
                 let user = createUser(socket, displayName);
-
                 await addUserToRoom(sessionId, 'guest', user);
                 const roomInfo = await getRoomInfo(sessionId);
                 const hostClientData = parseRoomInfoToClientData(roomInfo, 'host');
@@ -73,16 +74,44 @@ io.on('connection', (socket) => {
                 io.to(roomInfo.users.host.userId).emit('all_users_validated', hostClientData)
                 io.to(roomInfo.users.guest.userId).emit('all_users_validated', guestClientData)
             }
-
         } catch (err) {
             console.log("error at validating code: ", err)
         }
     })
 
     socket.on('send_message', (messageData) => {
-        //TODO: handle sending messages
+        //create a server message entity
+        let serverMessageNode = createServerMessageNode(messageData);
+
+        //create a client message entity
+        let clientMessageNode = createClientMessageNode(messageData);
+
+        //send client message to client
+        socket.to(messageData.sessionId).emit('receive_message', clientMessageNode)
+
+        //send server message to server
+        addMessageToRoom(messageData.sessionId, serverMessageNode)
+
+
+        //TODO: handle mediator response 
     })  
 })
+
+
+
+const createServerMessageNode = (messageData) => {
+    let serverMessageNode = {
+        "role": messageData.displayName == "Mediator" ? "assistant" : "user",
+        "name": messageData.displayName,
+        "content": messageData.message
+    }
+    return serverMessageNode
+}
+
+const createClientMessageNode = (messageData) => {
+    let clientMessageNode = {...messageData, type: "incomming"}
+    return clientMessageNode
+}
 
 const parseRoomInfoToClientData = (roomInfo, role) => {
     return {

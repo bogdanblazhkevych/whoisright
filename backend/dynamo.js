@@ -55,6 +55,8 @@ const addUserToRoom = async (sessionId, userType, user) => {
         }
     };
 
+    console.log(AWS.DynamoDB.Converter.marshall({user}).user)
+
     try {
         const data = await dynamoClient.updateItem(params).promise();
         console.log(`Chatroom updated with ${userType} information:`, data);
@@ -99,13 +101,31 @@ const getRoomInfo = async (sessionId) => {
     }
 }
 
+const addMessageToRoom = async (sessionId, message) => {
+    const params = {
+        TableName: "chatrooms",
+        Key: {"sessionId": {"S": sessionId}},
+        UpdateExpression: 'SET #messages = list_append(#messages, :newMessage)',
+        ExpressionAttributeNames: {'#messages': "messages"},
+        ExpressionAttributeValues: {':newMessage': {"L": [AWS.DynamoDB.Converter.marshall({message}).message]}}
+    };
+
+    try {
+        const data = await dynamoClient.updateItem(params).promise()
+        console.log('message added to database sicessfully: ', data)
+    } catch (err) {
+        console.log("error at adding message to database: ", err)
+    }
+}
+
 
 const dbfunctions = {
     createRoomInDatabase,
     addUserToRoom,
     checkIfRoomExists,
-    getRoomInfo
+    getRoomInfo,
+    addMessageToRoom
 }
 
 export default dbfunctions
-export { createRoomInDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo }
+export { createRoomInDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom }
