@@ -109,7 +109,7 @@ const addMessageToRoom = async (sessionId, message) => {
         ExpressionAttributeNames: {'#messages': "messages"},
         ExpressionAttributeValues: {':newMessage': {"L": [AWS.DynamoDB.Converter.marshall({message}).message]}}
     };
-
+    
     try {
         const data = await dynamoClient.updateItem(params).promise()
         console.log('message added to database sicessfully: ', data)

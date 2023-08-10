@@ -21,7 +21,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://192.168.1.5:3000`,
+    origin: `http://10.94.73.170:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -65,14 +65,16 @@ io.on('connection', (socket) => {
         try {   
             let roomExists = await checkIfRoomExists(sessionId)
             if (roomExists) {
-                //TODO: clean this up, restructure frontend if needed
+                //create user
                 let user = createUser(socket, displayName);
+                //add user to room
                 await addUserToRoom(sessionId, 'guest', user);
+                //get room info
                 const roomInfo = await getRoomInfo(sessionId);
-                const hostClientData = parseRoomInfoToClientData(roomInfo, 'host');
-                const guestClientData = parseRoomInfoToClientData(roomInfo, 'guest');
-                io.to(roomInfo.users.host.userId).emit('all_users_validated', hostClientData)
-                io.to(roomInfo.users.guest.userId).emit('all_users_validated', guestClientData)
+                //get client data
+                const clientData = parseRoomInfoToClientData(roomInfo);
+                //send client data to client
+                io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('all_users_validated', clientData)
             }
         } catch (err) {
             console.log("error at validating code: ", err)
@@ -113,9 +115,8 @@ const createClientMessageNode = (messageData) => {
     return clientMessageNode
 }
 
-const parseRoomInfoToClientData = (roomInfo, role) => {
+const parseRoomInfoToClientData = (roomInfo) => {
     return {
-        role: role,
         sessionId: roomInfo.sessionId,
         host: {
             displayName: roomInfo.users.host.displayName,
@@ -125,6 +126,16 @@ const parseRoomInfoToClientData = (roomInfo, role) => {
             displayName: roomInfo.users.guest.displayName,
             userId: roomInfo.users.guest.userId
         }
+    }
+}
+
+const getClientData = async (sessionId) => {
+    try {
+        let roomInfo = await getRoomInfo(sessionId)
+        let data = parseRoomInfoToClientData(roomInfo)
+        return data
+    } catch (err) {
+        console.log("Error in getClientData function")
     }
 }
 
