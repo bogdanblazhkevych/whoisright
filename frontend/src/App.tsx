@@ -5,7 +5,7 @@ import Join from './modules/join/join';
 
 interface ChatDataInterface {
   sessionId: string,
-  role: string,
+  // role: string,
   host: {
     displayName: string,
     userId: string
@@ -16,13 +16,14 @@ interface ChatDataInterface {
   }
 }
 
+type userType = "guest" | "host"
+ 
 function App() {
   const [currentDisplay, setCurrentDisplay] = useState('find-session');
-  const [sessionId, setSessionId] = useState('');
-  const [userId, setUserId] = useState('');
+  const [userType, setUserType] = useState<userType>('guest')
+
   const [chatData, setChatData] = useState<ChatDataInterface>({
     sessionId: 'sessionId',
-    role: 'role',
     host: {
       displayName: 'name',
       userId: 'userId'
@@ -36,9 +37,21 @@ function App() {
   return (
     <div className="App">
 
-      {currentDisplay === "find-session" && <Join setCurrentDisplay={setCurrentDisplay} chatData={chatData} setChatData={setChatData}/>}
-      {/* <Join /> */}
-      {currentDisplay === "chatroom" && <Chat chatData={chatData}/>}
+      {currentDisplay === "find-session" && 
+      <>
+          <Join setCurrentDisplay={setCurrentDisplay} 
+                chatData={chatData} 
+                setChatData={setChatData}
+                setUserType={setUserType}/>
+      </>
+      }
+
+      {currentDisplay === "chatroom" && 
+        <>
+          <Chat chatData={chatData}
+                userType={userType}/>
+        </>
+      }
     </div>
   );
 }

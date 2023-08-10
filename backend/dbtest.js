@@ -129,16 +129,6 @@ const parseRoomInfoToClientData = (roomInfo) => {
     }
 }
 
-const getClientData = async (sessionId) => {
-    try {
-        let roomInfo = await getRoomInfo(sessionId)
-        let data = parseRoomInfoToClientData(roomInfo)
-        return data
-    } catch (err) {
-        console.log("Error in getClientData function")
-    }
-}
-
 const port = process.env.PORT || 8000;
 
 app.get('/', function(req, res){

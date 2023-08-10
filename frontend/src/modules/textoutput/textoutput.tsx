@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import textoutputcss from './textoutput.module.css'
 
 interface ChatMessageInterface {
-    // sender: string;
     message: string,
     sessionId: string,
     type: string,
@@ -27,7 +26,6 @@ export default function Textoutput(props: TextoutputInterface){
     return(
         <div className={textoutputcss.textoutputwrapper} ref={textOutputWrapperRef}>
             {messageLog.map((chatMessage: ChatMessageInterface, index: number) => {
-                console.log(chatMessage.userId != messageLog[index + 1]?.userId)
                 return (
                     <>
                         <div key={index} className={`${textoutputcss.message} ${textoutputcss[chatMessage.type]}`}>{chatMessage.message}</div>

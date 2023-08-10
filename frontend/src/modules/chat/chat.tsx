@@ -15,7 +15,6 @@ interface ClientToServerEvents {
 }
 
 interface ChatMessageInterface {
-    // sender: string;
     message: string,
     sessionId: string,
     type: string,
@@ -26,7 +25,6 @@ interface ChatMessageInterface {
 interface ChatPropsInterface {
     chatData: {
         sessionId: string,
-        role: string,
         host: {
           displayName: string,
           userId: string
@@ -35,16 +33,17 @@ interface ChatPropsInterface {
           displayName: string,
           userId: string
         }
-    }
+    },
+    userType: "guest" | "host";
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.5:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://10.94.73.170:8000`);
 
 export default function Chat(props: ChatPropsInterface){
-    const { chatData } = props;
+    const { chatData, userType } = props;
     const sessionId = chatData.sessionId;
-    const userId = chatData.role === 'host' ? chatData.host.userId : chatData.guest.userId;
-    const displayName = chatData.role === 'host' ? chatData.host.displayName : chatData.guest.displayName;
+    const userId = chatData[userType].userId
+    const displayName = chatData[userType].displayName
     const type = "outgoing"
     const [messageLog, setMessageLog] = useState<ChatMessageInterface[]>([]);
 

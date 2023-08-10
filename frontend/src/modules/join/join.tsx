@@ -13,14 +13,14 @@ interface ClientToServerEvents {
 }
 
 interface JoinPropsInterface {
-    setCurrentDisplay: (a: string) => void;
+    setCurrentDisplay: (currentDisplay: string) => void;
     chatData: ChatDataInterface;
     setChatData: (chatData: ChatDataInterface) => void;
+    setUserType: (userType: "guest" | "host") => void;
 }
 
 interface ChatDataInterface {
     sessionId: string,
-    role: string,
     host: {
       displayName: string,
       userId: string
@@ -31,11 +31,11 @@ interface ChatDataInterface {
     }
   }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.5:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://10.94.73.170:8000`);
 
 export default function Join(props: JoinPropsInterface){
 
-    const { setCurrentDisplay, setChatData, chatData } = props
+    const { setCurrentDisplay, setChatData, chatData, setUserType } = props
 
     const [currentJoinDisplay, setCurrentJoinDisplay] = useState('chose')
     const [displayName, setDisplayName] = useState('')
@@ -45,6 +45,7 @@ export default function Join(props: JoinPropsInterface){
         if (displayName.length === 0) {
             return
         }
+        setUserType('host')
         socket.emit("generate_code", displayName)
     }
 
@@ -52,6 +53,7 @@ export default function Join(props: JoinPropsInterface){
         if (displayName.length === 0) {
             return
         } 
+        setUserType('guest')
         setCurrentJoinDisplay('enter-code')
     }
 
@@ -93,12 +95,6 @@ export default function Join(props: JoinPropsInterface){
                         <div className={joincss.heading}>
                             ARBITRATOR.AI
                         </div>
-                        {/* <div className={joincss.body}>
-                        Welcome to Arbitrator.ai, the cutting-edge platform where all kinds of disputes find meaningful resolutions through arbitration powered by the latest Ai technology. Enter a chat room with your opposing party and begin discussing your dispute. You will be joined by an Ai arbitrator who will moderate the discussion and ultimately propose a resolution.  
-                        </div> */}
-                        {/* <div className={joincss.body}>
-                        Enter a chat room with your opposing party and begin discussing your dispute. You will be joined by an Ai arbitrator who will moderate the discussion and ultimately propose a resolution.  
-                        </div> */}
                         <div className={joincss.body}>
                         Ai driven conflict resolution
                         </div>
@@ -115,14 +111,12 @@ export default function Join(props: JoinPropsInterface){
 
                     <div className={joincss.inputwrapper}>
                         <input className={joincss.codeinput} onChange={handleDisplayNameInput} value={displayName} placeholder="Display Name"></input>
-                        {/* <div className={joincss.chosebuttonwrapper}> */}
                         <div className={joincss.divbutton} onClick={createSession}>
                             Create Session
                         </div>
                         <div className={joincss.divbutton} onClick={joinSession}>
                             Join Session
                         </div>
-                        {/* </div> */}
                     </div>
                 </div>
             }
