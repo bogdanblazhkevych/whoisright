@@ -4,15 +4,16 @@ import Textoutput from "../textoutput/textoutput";
 import chatcss from "./chat.module.css"
 import { io, Socket } from "socket.io-client";
 import ChatDetails from "../chatdetails/chatdetails";
+import socket from './../../socket'
 
-interface ServerToClientEvents {
-  receive_message: (dataObject: {message: string, sessionId: string, type: string, userId: string, displayName: string}) => void;
-}
+// interface ServerToClientEvents {
+//   receive_message: (dataObject: {message: string, sessionId: string, type: string, userId: string, displayName: string}) => void;
+// }
 
-interface ClientToServerEvents {
-  send_message: (dataObject: {message: string, sessionId: string, type: string, userId: string, displayName: string}) => void;
-  join_room: (sessionId: string) => void;
-}
+// interface ClientToServerEvents {
+//   send_message: (dataObject: {message: string, sessionId: string, type: string, userId: string, displayName: string}) => void;
+//   join_room: (sessionId: string) => void;
+// }
 
 interface ChatMessageInterface {
     message: string,
@@ -37,7 +38,7 @@ interface ChatPropsInterface {
     userType: "guest" | "host";
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://10.94.73.170:8000`);
+// const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.5:8000`);
 
 export default function Chat(props: ChatPropsInterface){
     const { chatData, userType } = props;
@@ -52,6 +53,7 @@ export default function Chat(props: ChatPropsInterface){
         socket.emit('join_room', sessionId)
 
         socket.on('receive_message', (message) => {
+            console.log(message)
             setMessageLog((previous) => [...previous, message])            
         })
     }, [socket])

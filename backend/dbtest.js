@@ -21,7 +21,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://10.94.73.170:3000`,
+    origin: `http://192.168.1.5:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -81,7 +81,7 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('send_message', (messageData) => {
+    socket.on('send_message', async (messageData) => {
         //create a server message entity
         let serverMessageNode = createServerMessageNode(messageData);
 
@@ -91,15 +91,65 @@ io.on('connection', (socket) => {
         //send client message to client
         socket.to(messageData.sessionId).emit('receive_message', clientMessageNode)
 
-        //send server message to server
-        addMessageToRoom(messageData.sessionId, serverMessageNode)
+        try {
+            //send server message to server
+            await addMessageToRoom(messageData.sessionId, serverMessageNode)
+            let roomInfo = await getRoomInfo(messageData.sessionId)
 
-
-        //TODO: handle mediator response 
+            //TODO: handle mediator response 
+            handleMediatorResponse(roomInfo)
+        } catch (err) {
+            console.log('error in sending message async code')
+        }
     })  
 })
 
+async function getMediatorResponse(messages) {
+    const completion = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: messages,
+    });
 
+    return completion.data.choices[0].message.content
+}
+
+const handleMediatorResponse = async (roomInfo) => {
+    //decide wether or not mediator should respond
+    if (roomInfo.messages.length % 3 != 0) {
+        return
+    }
+
+    try {
+        let response = await getMediatorResponse(roomInfo.messages);
+        let serverMessageNode = parseMediatorResponseToServerMessageNode(response);
+        let clientMessageNode = parseMediatorResponseToClientMessageNode(response, roomInfo.sessionId)
+        await addMessageToRoom(roomInfo.sessionId, serverMessageNode);
+        io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('receive_message', clientMessageNode)
+    } catch (err) {
+        console.log("error in handling mediator response", err)
+    }
+}
+function parseMediatorResponseToServerMessageNode(response) {
+    let serverMessageNode = {
+        role: "assistant",
+        name: "Mediator",
+        content: response
+    }
+
+    return serverMessageNode
+}
+
+function parseMediatorResponseToClientMessageNode(response, sessionId) {
+    let clientMessageNode = {
+        message: response,
+        sessionId: sessionId,
+        type: 'mediator',
+        userId: 'Mediator',
+        displayName: 'Mediator'
+    }
+
+    return clientMessageNode
+}
 
 const createServerMessageNode = (messageData) => {
     let serverMessageNode = {
