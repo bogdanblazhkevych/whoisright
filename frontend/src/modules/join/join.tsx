@@ -1,17 +1,6 @@
 import React, {useEffect, useState} from "react";
 import joincss from "./join.module.css"
 import socket from './../../socket'
-// import { io, Socket } from "socket.io-client";
-
-// interface ServerToClientEvents {
-//   code_generated: (a: string) => void;
-//   all_users_validated: (chatData: ChatDataInterface) => void;
-// }
-
-// interface ClientToServerEvents {
-//   generate_code: (displayName: string) => void;
-//   validate_code: (codeInput: string, displayName: string) => void;
-// }
 
 interface JoinPropsInterface {
     setCurrentDisplay: (currentDisplay: string) => void;
@@ -31,8 +20,6 @@ interface ChatDataInterface {
       userId: string
     }
 }
-
-// const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.5:8000`);
 
 export default function Join(props: JoinPropsInterface){
 

@@ -1,6 +1,5 @@
 import React, { useState, useRef } from "react";
 import { BsFillArrowUpRightCircleFill } from 'react-icons/bs';
-import { disposeEmitNodes } from "typescript";
 import textcss from "./textinput.module.css"
 
 interface TextInputPropsInterface {
