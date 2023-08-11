@@ -5,8 +5,7 @@ import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from 'openai';
-import Room from "./room.js"
-import User from "./user.js"
+import {addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom} from './dynamo.js'
 
 dotenv.config();
 
@@ -22,204 +21,188 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://192.168.1.9:3000`,
+    origin: `http://192.168.1.5:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
-
-
-// ------ chatRooms Schema ------
-// chatRooms = {
-//     A6B78H: {
-//         connectedUsers: 2,
-//         host: {
-//             validated: true,
-//             socket: "socket object",
-//             userID: "556795",
-//             displayName: 'cody'
-//         },
-//         guest: {
-//             validated: true,
-//             socket: "socket object",
-//             userID: "998654",
-//             displayName: 'randy'
-//         },
-//         messages: [
-//             {
-//                 userId: "998654",
-//                 displayName: 'randy',
-//                 message: "you stole my code"
-//             },
-//             {
-//                 userId: "556795",
-//                 displayName: 'cody',
-//                 message: "you stole it from WDS"
-//             }
-//         ]
-//     }
-// }
-
-const chatRooms = {}
 
 function generateCode() {
     return crypto.randomBytes(3).toString('hex').toUpperCase()
 }
 
-function createStringMessageLog(messageLog) {
-    return messageLog.map(message => `${message.displayName}: ${message.message}`).join(': ');
+function createUser(socket, displayName) {
+    return {
+        userId: socket.id,
+        displayName: displayName,
+    }
 }
 
-function createObjectMessageLog(messageLog, primer) {
-    let openAiMessagesArray = [{"role": "system", "content": primer}]
-
-    messageLog.forEach((messageNode) => {
-        let messageObject = {"role": "user", "name": messageNode.displayName, "content": messageNode.message}
-        openAiMessagesArray.push(messageObject)
+io.on('connection', (socket) => { 
+    socket.on('join_room', (sessionId) => {
+        socket.join(sessionId)
     })
 
-    return openAiMessagesArray
-}   
+    socket.on('generate_code', async (displayName) => {
+        let sessionId = generateCode()
+        let room = createRoom(sessionId)
+        try {
+            await addRoomToDatabase(room)
+    
+            let user = createUser(socket, displayName);
+    
+            await addUserToRoom(sessionId, 'host', user)
+    
+            socket.emit('code_generated', sessionId);
+        } catch (err) {
+            console.log("error at generating code", err)
+        }
+    })
 
-async function getVerdict(messageLog) {
+    socket.on("validate_code", async (sessionId, displayName) => {
+        try {   
+            let roomExists = await checkIfRoomExists(sessionId)
+            if (roomExists) {
+                //create user
+                let user = createUser(socket, displayName);
+                //add user to room
+                await addUserToRoom(sessionId, 'guest', user);
+                //get room info
+                const roomInfo = await getRoomInfo(sessionId);
+                //get client data
+                const clientData = parseRoomInfoToClientData(roomInfo);
+                //send client data to client
+                io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('all_users_validated', clientData)
+            }
+        } catch (err) {
+            console.log("error at validating code: ", err)
+        }
+    })
 
-    const primer = `You are a conflict mediator. You must analyze these two points of view and 
-    come to a definative resolution. You must only use the conversation avalible at hand: do not ask 
-    to be provided with aditional context or evidence. You are less of a conflict mediator, more-so te judge, 
-    the jury, and executioner. What you say goes and you have the final decision. You must make one that is 
-    firm and decisive. You may on ocassion declare no winners, but keep this as a last resort option. If the 
-    argument is opinion based, such as which brand is better, you MUST make a decision and side with one 
-    of the parties, and you must provide reasoning for your decision. If the arggument is subjective and depends 
-    on personal preferance, you must chose a winner. Pick one at randome if you must, but chose a winner. 
-    Keep your rulings brief, 15 sentences maximum.`
+    socket.on('send_message', async (messageData) => {
+        //create a server message entity
+        let serverMessageNode = createServerMessageNode(messageData);
 
-    const chatString = createStringMessageLog(messageLog)
-    const messageArray = createObjectMessageLog(messageLog, primer)
+        //create a client message entity
+        let clientMessageNode = createClientMessageNode(messageData);
 
-    // console.log(messageArray)
+        //send client message to client
+        socket.to(messageData.sessionId).emit('receive_message', clientMessageNode)
 
+        try {
+            //send server message to server
+            await addMessageToRoom(messageData.sessionId, serverMessageNode)
+            let roomInfo = await getRoomInfo(messageData.sessionId)
+
+            //TODO: handle mediator response 
+            handleMediatorResponse(roomInfo)
+        } catch (err) {
+            console.log('error in sending message async code')
+        }
+    })  
+})
+
+async function getMediatorResponse(messages) {
     const completion = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
-        messages: messageArray,
+        messages: messages,
     });
 
     return completion.data.choices[0].message.content
 }
-  
-io.on('connection', (socket) => {
 
-    socket.on("join_room", (sessionId) => {
-        socket.join(sessionId)
-    })
+const handleMediatorResponse = async (roomInfo) => {
+    //decide wether or not mediator should respond
+    if (roomInfo.messages.length % 3 != 0) {
+        return
+    }
 
-    socket.on("send_message", (messageData) => {
-        let { message, sessionId, userId, displayName } = messageData;
-        let messagesContainer = chatRooms[sessionId].messages;
-        let updatedMessageData = {message, sessionId, userId, type: "incomming", displayName};
+    try {
+        let response = await getMediatorResponse(roomInfo.messages);
+        let serverMessageNode = parseMediatorResponseToServerMessageNode(response);
+        let clientMessageNode = parseMediatorResponseToClientMessageNode(response, roomInfo.sessionId)
+        await addMessageToRoom(roomInfo.sessionId, serverMessageNode);
+        io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('receive_message', clientMessageNode)
+    } catch (err) {
+        console.log("error in handling mediator response", err)
+    }
+}
+function parseMediatorResponseToServerMessageNode(response) {
+    let serverMessageNode = {
+        role: "assistant",
+        name: "Mediator",
+        content: response
+    }
 
-        socket.to(sessionId).emit('receive_message', updatedMessageData);
+    return serverMessageNode
+}
 
-        let messageNode = {
-            userId: userId,
-            message: message,
-            displayName: displayName
-        };
+function parseMediatorResponseToClientMessageNode(response, sessionId) {
+    let clientMessageNode = {
+        message: response,
+        sessionId: sessionId,
+        type: 'mediator',
+        userId: 'Mediator',
+        displayName: 'Mediator'
+    }
 
-        messagesContainer.push(messageNode);
-        console.log("messagesContainer: ", messagesContainer)
-        if (messagesContainer.length % 3 == 0) {
-            getVerdict(messagesContainer)
-            .then((verdict) => {
-                messagesContainer.push({userId:'system', message: verdict, displayName:'mediator'})
+    return clientMessageNode
+}
 
-                let verdictMessageData = {
-                    message: verdict,
-                    sessionId: sessionId,
-                    type: 'mediator',
-                    userId: 'Mediator',
-                    displayName: 'Mediator'
-                };
+const createServerMessageNode = (messageData) => {
+    let serverMessageNode = {
+        "role": messageData.displayName == "Mediator" ? "assistant" : "user",
+        "name": messageData.displayName,
+        "content": messageData.message
+    }
+    return serverMessageNode
+}
 
-                let hostSocket = chatRooms[sessionId].host.socket;
-                hostSocket.to(sessionId).emit('receive_message', verdictMessageData);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+const createClientMessageNode = (messageData) => {
+    let clientMessageNode = {...messageData, type: "incomming"}
+    return clientMessageNode
+}
+
+const parseRoomInfoToClientData = (roomInfo) => {
+    return {
+        sessionId: roomInfo.sessionId,
+        host: {
+            displayName: roomInfo.users.host.displayName,
+            userId: roomInfo.users.host.userId
+        },
+        guest: {
+            displayName: roomInfo.users.guest.displayName,
+            userId: roomInfo.users.guest.userId
         }
-    })
+    }
+}
 
-    socket.on("generate_code", (displayName) => {
-        const code = generateCode();
-        const userId = generateCode();
-
-        chatRooms[code] = {
-            connectedUsers: 1,
-            host: {
-                validated: true,
-                socket: socket,
-                userId: userId,
-                displayName: displayName
+const createRoom = (sessionId) => {
+    return {
+        sessionId: sessionId,
+        users: {
+            'host': {
+                userId: null,
+                dipslayName: null
             },
-            guest: {
-                validated: false,
-                socket: null,
+            'guest': {
                 userId: null,
                 displayName: null
-            },
-            messages: [{userId:'system', message: "Hello I am your arbitrator.", displayName:'mediator'}]
-        };
-
-        socket.emit('code_generated', code);
-
-        // //trying out oop
-
-        // //creating a room
-        // let testRoomCode = generateCode();
-        // chatRooms[testRoomCode] = new Room(testRoomCode);
-        // let room = chatRooms[testRoomCode];
-
-        // //creating a user
-        // let testUserId = generateCode();
-        // let user = new User(true, socket, testUserId, displayName);
-
-        // //adding user to room
-        // room.addUser('host', user)
-        // console.log(chatRooms[testRoomCode])
-        // console.log(chatRooms[code])
-    })
-
-    socket.on("validate_code", (code, displayName) => {
-        if (chatRooms[code]) {
-
-            if (chatRooms[code].connectedUsers === 1) {
-                const userId = generateCode();
-
-                chatRooms[code].connectedUsers = 2;
-                chatRooms[code].guest.validated = true;
-                chatRooms[code].guest.socket = socket;
-                chatRooms[code].guest.userId = userId;
-                chatRooms[code].guest.displayName = displayName
-
-                if (chatRooms[code].host.validated && chatRooms[code].guest.validated) {
-                    const chatData = {
-                        role: 'host',
-                        sessionId: code,
-                        host: {
-                            displayName: chatRooms[code].host.displayName,
-                            userId: chatRooms[code].host.userId
-                        },
-                        guest: {
-                            displayName: chatRooms[code].guest.displayName,
-                            userId: chatRooms[code].guest.userId
-                        }
-                    }
-                    chatRooms[code].host.socket.emit("all_users_validated", {...chatData, role: 'host'})
-                    chatRooms[code].guest.socket.emit("all_users_validated", {...chatData, role: 'guest'})
-                }
             }
-        }
-    })
-});
+        },
+        messages: [{
+            'role': 'system',
+            'content': `You are a conflict mediator. You must analyze these two points of view and 
+            come to a definative resolution. You must only use the conversation avalible at hand: do not ask 
+            to be provided with aditional context or evidence. You are less of a conflict mediator, more-so te judge, 
+            the jury, and executioner. What you say goes and you have the final decision. You must make one that is 
+            firm and decisive. You may on ocassion declare no winners, but keep this as a last resort option. If the 
+            argument is opinion based, such as which brand is better, you MUST make a decision and side with one 
+            of the parties, and you must provide reasoning for your decision. If the arggument is subjective and depends 
+            on personal preferance, you must chose a winner. Pick one at randome if you must, but chose a winner. 
+            Keep your rulings brief, 15 sentences maximum.`
+        }]
+    }
+}
 
 const port = process.env.PORT || 8000;
 
