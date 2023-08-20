@@ -1,11 +1,10 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import './App.css';
 import Chat from './modules/chat/chat';
 import Join from './modules/join/join';
 
 interface ChatDataInterface {
   sessionId: string,
-  // role: string,
   host: {
     displayName: string,
     userId: string
@@ -23,33 +22,28 @@ function App() {
   const [userType, setUserType] = useState<userType>('guest')
 
   const [chatData, setChatData] = useState<ChatDataInterface>({
-    sessionId: 'sessionId',
+    sessionId: '',
     host: {
-      displayName: 'name',
-      userId: 'userId'
+      displayName: '',
+      userId: ''
     },
     guest: {
-      displayName: 'name',
-      userId: 'userId'
+      displayName: '',
+      userId: ''
     }
   })
 
   return (
     <div className="App">
-
       {currentDisplay === "find-session" && 
       <>
-          <Join setCurrentDisplay={setCurrentDisplay} 
-                chatData={chatData} 
-                setChatData={setChatData}
-                setUserType={setUserType}/>
+          <Join setCurrentDisplay={setCurrentDisplay} chatData={chatData} setChatData={setChatData}setUserType={setUserType}/>
       </>
       }
 
       {currentDisplay === "chatroom" && 
         <>
-          <Chat chatData={chatData}
-                userType={userType}/>
+          <Chat chatData={chatData} userType={userType}/>
         </>
       }
     </div>
