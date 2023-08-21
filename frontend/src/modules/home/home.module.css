@@ -1,0 +1,104 @@
+.homewrapper{
+    display: flex;
+    box-sizing: border-box;
+    /* border: 1px solid purple; */
+    max-width: 800px;
+    width: 50%;
+    /* height: 100%; */
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.chosewrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.textwrapper{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    max-width: 800px;
+    font-size: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: min-content;
+}
+
+.heading{
+    font-weight: 800;
+    color:#E1E1E3;
+}  
+
+.body{
+    font-size: 30%;
+    font-weight: 500;
+    text-align: center;
+    color:#9f9fa0;
+    padding-bottom: 1rem;
+
+}
+
+.inputwrapper{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+}
+
+.codeinput{
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    box-shadow: none;
+    box-sizing: border-box;
+    border-radius: 20px;
+    padding: 8px 15px;
+    border: 2px solid #4C4C4C;
+    background-color: #1E1E1E;
+    color: white;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.codeinput:focus{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    box-shadow: none;
+    /* border: none; */
+}
+
+.codeinput:active{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    box-shadow: none;
+}
+
+.divbutton{
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    box-shadow: none;
+    box-sizing: border-box;
+    border-radius: 20px;
+    padding: 8px 15px;
+    border: 2px solid #4C4C4C;
+    background-color: #4C4C4C;
+    color: white;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+}
+
+/* .homewrapper > button, input {
+    align-self: center;
+} */

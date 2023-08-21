@@ -25,6 +25,6 @@ interface ClientToServerEvents {
   validate_code: (codeInput: string, displayName: string) => void;
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://172.16.227.137:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://172.20.10.2:8000`);
 
 export default socket
