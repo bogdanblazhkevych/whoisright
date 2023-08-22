@@ -3,6 +3,7 @@ import joincss from "./join.module.css"
 import socket from './../../socket'
 import Home from "../home/home";
 import Displaysessionid from "../displaysessionid/displaysessionid";
+import Entersessionid from "../entersessionid/entersessionid";
 
 interface JoinPropsInterface {
     setCurrentDisplay: (currentDisplay: string) => void;
@@ -89,9 +90,7 @@ export default function Join(props: JoinPropsInterface) {
                 <Displaysessionid sessionId={chatData.sessionId}/>
             }
             {currentJoinDisplay === "enter-code" &&
-                <>
-                    <input className={joincss.codeinput} onChange={handleCodeInputChange} onKeyDown={handleKeyDown} value={codeInput}></input>
-                </>
+                <Entersessionid handleCodeInputChange={handleCodeInputChange} handleKeyDown={handleKeyDown} codeInput={codeInput}/>
             }
         </div>
     )
