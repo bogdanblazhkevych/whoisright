@@ -4,28 +4,26 @@ import { Server } from 'socket.io';
 import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import { Configuration, OpenAIApi } from 'openai';
 import {addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom} from './dynamo.js'
 import { Room } from './room.js'
 import { User } from './user.js';
+import getMediatorResponse from './mediator.js';
 
 dotenv.config();
-
-const configuration = new Configuration({
-    apiKey: process.env.API_KEY,
-});
-
-const openai = new OpenAIApi(configuration);
 
 const app = express();
 app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://10.94.73.170:3000`,
+    origin: `http://192.168.1.5:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
+
+//TODO;
+//handle users leaving
+//handle cleanup in db
 
 io.on('connection', (socket) => { 
     socket.on('join_room', (sessionId) => {
@@ -54,6 +52,8 @@ io.on('connection', (socket) => {
                 const roomInfo = await getRoomInfo(sessionId);
                 const clientData = parseRoomInfoToClientData(roomInfo);
                 io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('all_users_validated', clientData)
+            } else {
+                socket.emit("invalid_session_id")
             }
         } catch (err) {
             console.log("error at validating code: ", err)
@@ -69,22 +69,16 @@ io.on('connection', (socket) => {
         try {
             await addMessageToRoom(messageData.sessionId, serverMessage)
             let roomInfo = await getRoomInfo(messageData.sessionId)
-
             handleMediatorResponse(roomInfo)
         } catch (err) {
             console.log('error in sending message async code')
         }
     })  
+
+    socket.on('user_disconnected', (userData) => {
+        //do something
+    })
 })
-
-async function getMediatorResponse(messages) {
-    const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: messages,
-    });
-
-    return completion.data.choices[0].message.content
-}
 
 const handleMediatorResponse = async (roomInfo) => {
     //decide wether or not mediator should respond
@@ -93,7 +87,7 @@ const handleMediatorResponse = async (roomInfo) => {
     }
 
     try {
-        let response = await getMediatorResponse(roomInfo.messages);
+        let response = await getMediatorResponse(roomInfo.messages)
         let serverMessage = mapMediatorResponseToServerSchema(response);
         let clientMessage = mapMediatorResponseToClientSchema(response, roomInfo.sessionId)
         await addMessageToRoom(roomInfo.sessionId, serverMessage);
@@ -103,8 +97,6 @@ const handleMediatorResponse = async (roomInfo) => {
     }
 }
 
-//TODO: rename function. maybe mapMediatorResponseToBackendSchema
-//TODO: make es6 arrow
 const mapMediatorResponseToServerSchema = (response) => {
     let serverMessageNode = {
         role: "assistant",
@@ -115,7 +107,6 @@ const mapMediatorResponseToServerSchema = (response) => {
     return serverMessageNode
 }
 
-//TODO: rename function. maybe mapMediatorResponseToClientSchema
 const mapMediatorResponseToClientSchema = (response, sessionId) => {
     let clientMessageNode = {
         message: response,
@@ -128,7 +119,6 @@ const mapMediatorResponseToClientSchema = (response, sessionId) => {
     return clientMessageNode
 }
 
-//TODO: rename function. maybe mapMessageDataToBackendSchema
 const mapMessageDataToServerSchema = (messageData) => {
     return {
         "role": messageData.displayName == "Mediator" ? "assistant" : "user",
@@ -137,7 +127,6 @@ const mapMessageDataToServerSchema = (messageData) => {
     }
 }
 
-//TODO: rename functon. maybe markMessageAsIncomming
 const mapMessageDataToClientSchema = (messageData) => {
     return {...messageData, type: "incomming"}
 }
