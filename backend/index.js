@@ -44,16 +44,24 @@ io.on('connection', (socket) => {
     })
 
     socket.on("validate_code", async (sessionId, displayName) => {
-        try {   
-            let roomExists = await checkIfRoomExists(sessionId)
-            if (roomExists) {
-                let user = new User(socket.id, displayName);
-                await addUserToRoom(sessionId, 'guest', user);
-                const roomInfo = await getRoomInfo(sessionId);
-                const clientData = parseRoomInfoToClientData(roomInfo);
-                io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('all_users_validated', clientData)
-            } else {
-                socket.emit("invalid_session_id")
+        try {
+            let roomStatus = await getRoomStatus(sessionId);
+            console.log(roomStatus)
+            switch (roomStatus) {
+                case "roomValid":
+                    let user = new User(socket.id, displayName);
+                    await addUserToRoom(sessionId, 'guest', user);
+                    const parsedRoomInfo = await getParsedRoomInfo(sessionId)
+                    io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('all_users_validated', parsedRoomInfo)
+                    break;
+                case "roomFull":
+                    socket.emit("joinError", 'roomFull')
+                    break;
+                case "roomNotFound":
+                    socket.emit("joinError", "roomNotFound")
+                    break;
+                default:
+                    socket.emit("joinError", "unknownError")
             }
         } catch (err) {
             console.log("error at validating code: ", err)
@@ -143,6 +151,27 @@ const parseRoomInfoToClientData = (roomInfo) => {
             displayName: roomInfo.users.guest.displayName,
             userId: roomInfo.users.guest.userId
         }
+    }
+}
+
+const getRoomStatus = async (sessionId) => {
+    const roomInfo = await getRoomInfo(sessionId)
+    if (Object.keys(roomInfo).length === 0) {
+        return "roomNotFound"
+    } else if (roomInfo.users.guest.userId !== null) {
+        return "roomFull"
+    } else {
+        return "roomValid"
+    }
+}
+
+const getParsedRoomInfo = async (sessionId) => {
+    try {
+        const rawRoomInfo = await getRoomInfo(sessionId);
+        const parsedRoomInfo = parseRoomInfoToClientData(rawRoomInfo);
+        return parsedRoomInfo
+    } catch (err) {
+        console.log("error retreiving and parsing room info: ", err)
     }
 }
 

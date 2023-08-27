@@ -53,7 +53,6 @@ const checkIfRoomExists = async (sessionId) => {
     try {
         const data = await dynamoClient.getItem(params).promise();
         if (data.Item) {
-            console.log("sessionId exists")
             return true
         } else {
             console.log("sessionId does not exist")
