@@ -16,7 +16,7 @@ interface ServerToClientEvents {
   receive_message: (dataObject: {message: string, sessionId: string, type: string, userId: string, displayName: string}) => void,
   code_generated: (a: string) => void,
   all_users_validated: (chatData: ChatDataInterface) => void,
-  invalid_session_id: () => void
+  joinError: (errorName: string) => void
 }
 
 interface ClientToServerEvents {
@@ -26,6 +26,6 @@ interface ClientToServerEvents {
   validate_code: (codeInput: string, displayName: string) => void;
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.5:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.52:8000`);
 
 export default socket

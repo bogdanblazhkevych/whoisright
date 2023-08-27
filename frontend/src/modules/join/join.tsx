@@ -31,7 +31,7 @@ export default function Join(props: JoinPropsInterface) {
     const [currentJoinDisplay, setCurrentJoinDisplay] = useState('home')
     const [displayName, setDisplayName] = useState('')
     const [codeInput, setCodeInput] = useState('')
-    const [sessionIdInvalid, setSessionIdInvalid] = useState(false)
+    const [joinError, setJoinError] = useState({error: false, errorMessage: ''})
 
     function createSession() {
         if (displayName.length === 0) {
@@ -78,11 +78,21 @@ export default function Join(props: JoinPropsInterface) {
             setCurrentDisplay('chatroom')
         })
 
-        socket.on("invalid_session_id", () => {
-            setSessionIdInvalid(true)
+        socket.on("joinError", (errorName) => {
+            setJoinError(() => {
+                return {
+                    error: true,
+                    errorMessage: errorName
+                }
+            })
 
             setTimeout(() => {
-                setSessionIdInvalid(false)
+                setJoinError(() => {
+                    return {
+                        error: false,
+                        errorMessage: ''
+                    }
+                })
             }, 1000)
         })
     }, [socket])
@@ -102,7 +112,7 @@ export default function Join(props: JoinPropsInterface) {
                 <Entersessionid handleCodeInputChange={handleCodeInputChange} 
                                 handleKeyDown={handleKeyDown} 
                                 codeInput={codeInput} 
-                                sessionIdInvalid={sessionIdInvalid}/>
+                                joinError={joinError}/>
             }
         </div>
     )

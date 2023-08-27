@@ -16,7 +16,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://192.168.1.5:3000`,
+    origin: `http://192.168.1.52:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -46,19 +46,18 @@ io.on('connection', (socket) => {
     socket.on("validate_code", async (sessionId, displayName) => {
         try {
             let roomStatus = await getRoomStatus(sessionId);
-            console.log(roomStatus)
             switch (roomStatus) {
                 case "roomValid":
                     let user = new User(socket.id, displayName);
                     await addUserToRoom(sessionId, 'guest', user);
                     const parsedRoomInfo = await getParsedRoomInfo(sessionId)
-                    io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('all_users_validated', parsedRoomInfo)
+                    io.to([parsedRoomInfo.host.userId, parsedRoomInfo.guest.userId]).emit('all_users_validated', parsedRoomInfo)
                     break;
                 case "roomFull":
-                    socket.emit("joinError", 'roomFull')
+                    socket.emit("joinError", 'Room is full')
                     break;
                 case "roomNotFound":
-                    socket.emit("joinError", "roomNotFound")
+                    socket.emit("joinError", "Room not found")
                     break;
                 default:
                     socket.emit("joinError", "unknownError")
