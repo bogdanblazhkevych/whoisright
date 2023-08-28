@@ -16,7 +16,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://192.168.1.52:3000`,
+    origin: `http://192.168.1.5:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -37,6 +37,7 @@ io.on('connection', (socket) => {
         try {
             await addRoomToDatabase(room)
             await addUserToRoom(sessionId, 'host', user)
+            socket.userType = "host"
             socket.emit('code_generated', sessionId);
         } catch (err) {
             console.log("error at generating code", err)
@@ -51,6 +52,7 @@ io.on('connection', (socket) => {
                     let user = new User(socket.id, displayName);
                     await addUserToRoom(sessionId, 'guest', user);
                     const parsedRoomInfo = await getParsedRoomInfo(sessionId)
+                    socket.userType = "guest"
                     io.to([parsedRoomInfo.host.userId, parsedRoomInfo.guest.userId]).emit('all_users_validated', parsedRoomInfo)
                     break;
                 case "roomFull":
@@ -82,8 +84,8 @@ io.on('connection', (socket) => {
         }
     })  
 
-    socket.on('user_disconnected', (userData) => {
-        //do something
+    socket.on('disconnect', () => {
+        console.log('user disconnected', socket.userType)
     })
 })
 

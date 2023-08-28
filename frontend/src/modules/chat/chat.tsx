@@ -48,7 +48,7 @@ export default function Chat(props: ChatPropsInterface){
         socket.emit("send_message", {message, sessionId, type, userId, displayName})
         setMessageLog((previous) => [...previous, {message, sessionId, type, userId, displayName}]) 
     }
-
+    
     function didUserSendLastMessage() {
         if (messageLog.length > 0) {
             return messageLog[messageLog.length - 1].userId == userId
