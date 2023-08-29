@@ -1,4 +1,4 @@
-export class Room {
+export default class Room {
     constructor (sessionId) {
         this.sessionId = sessionId,
         this.users = {

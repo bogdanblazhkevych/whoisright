@@ -8,7 +8,7 @@ export default class Message {
         this.role = role
     }
 
-    serverSchema() {
+    get serverSchema() {
         return {
             role: this.role,
             name: this.displayName,
@@ -16,7 +16,7 @@ export default class Message {
         }
     }
 
-    clientSchema() {
+    get clientSchema() {
         return {
             message: this.message,
             sessionId: this.sessionId,
@@ -24,5 +24,13 @@ export default class Message {
             userId: this.userId,
             displayName: this.displayName
         }
+    }
+
+    static fromClientMessage(messageData) {
+        return new Message(messageData.message, messageData.sessionId, 'incomming', messageData.userId, messageData.displayName, 'user')
+    }
+
+    static fromMediatorResponse(mediatorResponse, sessionId) {
+        return new Message(mediatorResponse, sessionId, 'mediator', 'Mediator', 'Mediator')
     }
 }

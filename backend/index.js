@@ -5,8 +5,8 @@ import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import {addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom} from './dynamo.js'
-import { Room } from './room.js'
-import { User } from './user.js';
+import Room from './room.js'
+import User from './user.js';
 import getMediatorResponse from './mediator.js';
 import Message from './message.js'
 
@@ -17,7 +17,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://192.168.1.8:3000`,
+    origin: `http://192.168.1.9:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -71,10 +71,10 @@ io.on('connection', (socket) => {
     })
 
     socket.on('send_message', async (messageData) => {
-        let message = new Message(messageData.message, messageData.sessionId, 'incomming', messageData.userId, messageData.displayName, 'user')
-        socket.to(messageData.sessionId).emit('receive_message', message.clientSchema())
+        let message = Message.fromClientMessage(messageData)
+        socket.to(messageData.sessionId).emit('receive_message', message.clientSchema)
         try {
-            await addMessageToRoom(messageData.sessionId, message.serverSchema())
+            await addMessageToRoom(messageData.sessionId, message.serverSchema)
             let roomInfo = await getRoomInfo(messageData.sessionId)
             handleMediatorResponse(roomInfo)
         } catch (err) {
@@ -84,6 +84,11 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log('user disconnected', socket.userType)
+
+        //get room info
+        //if user or guest is null, remove the room from the database
+        //else remove socket.userType from the room, notify other user
+
     })
 })
 
@@ -94,9 +99,9 @@ const handleMediatorResponse = async (roomInfo) => {
     }
     try {
         let response = await getMediatorResponse(roomInfo.messages);
-        let message = new Message(response, roomInfo.sessionId, 'mediator', 'Mediator', 'Mediator', 'assistant')
-        await addMessageToRoom(roomInfo.sessionId, message.serverSchema());
-        io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('receive_message', message.clientSchema())
+        let message = Message.fromMediatorResponse(response, roomInfo.sessionId)
+        await addMessageToRoom(roomInfo.sessionId, message.serverSchema);
+        io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('receive_message', message.clientSchema)
     } catch (err) {
         console.log("error in handling mediator response", err)
     }
@@ -131,8 +136,7 @@ const getRoomStatus = async (sessionId) => {
 const getParsedRoomInfo = async (sessionId) => {
     try {
         const rawRoomInfo = await getRoomInfo(sessionId);
-        const parsedRoomInfo = parseRoomInfoToClientData(rawRoomInfo);
-        return parsedRoomInfo
+        return parseRoomInfoToClientData(rawRoomInfo);
     } catch (err) {
         console.log("error retreiving and parsing room info: ", err)
     }
