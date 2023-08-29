@@ -109,6 +109,42 @@ const getNumberOfMessages = async (sessionId) => {
     }
 }
 
+const removeRoomFromDatabase = async (sessionId) => {
+    //do something
+    const params = {
+        TableName: "chatrooms",
+        Key: {sessionId : {"S" : sessionId}},
+    }
+    try {
+        await dynamoClient.deleteItem(params).promise();
+        console.log(`chatroom ${sessionId} has been deleted`)
+    } catch (err) {
+        console.log("error in removing room from database: ", err)
+    }
+}
+
+const removeUserFromRoom = async (userType, sessionId) => {
+    //do something
+    const params = {
+        TableName: "chatrooms",
+        Key: {sessionId : {"S": sessionId}},
+        UpdateExpression: "SET #users.#userType = :userDetails",
+        ExpressionAttributeNames: {
+            '#users': 'users',
+            '#userType': userType
+        },
+        ExpressionAttributeValues: {
+            ':userDetails' : {"NULL": true}
+        }
+    }
+    try {
+        const data = await dynamoClient.updateItem(params).promise();
+        console.log(`Chatroom removed ${userType} from room`, data);
+    } catch (err) {
+        console.error('Error removing user from room:', err);
+    }   
+}
+
 
 const dbfunctions = {
     addRoomToDatabase,
@@ -116,8 +152,10 @@ const dbfunctions = {
     checkIfRoomExists,
     getRoomInfo,
     addMessageToRoom,
-    getNumberOfMessages
+    getNumberOfMessages,
+    removeUserFromRoom,
+    removeRoomFromDatabase
 }
 
 export default dbfunctions
-export { addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom, getNumberOfMessages }
+export { addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom, getNumberOfMessages, removeUserFromRoom, removeRoomFromDatabase }

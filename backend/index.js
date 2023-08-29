@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import {addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom} from './dynamo.js'
+import {addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom, removeUserFromRoom, removeRoomFromDatabase} from './dynamo.js'
 import Room from './room.js'
 import User from './user.js';
 import getMediatorResponse from './mediator.js';
@@ -22,24 +22,20 @@ const io = new Server(server, {
     },
 });
 
-//TODO;
-//handle users leaving
-//handle cleanup in db
-
 io.on('connection', (socket) => { 
     socket.on('join_room', (sessionId) => {
         socket.join(sessionId)
     })
 
     socket.on('generate_code', async (displayName) => {
-        let sessionId = generateCode()
-        let room = new Room(sessionId)
+        socket.userType = "host"
+        socket.sessionId = generateCode()
+        let room = new Room(socket.sessionId)
         let user = new User(socket.id, displayName)
         try {
             await addRoomToDatabase(room)
-            await addUserToRoom(sessionId, 'host', user)
-            socket.userType = "host"
-            socket.emit('code_generated', sessionId);
+            await addUserToRoom(socket.sessionId, 'host', user)
+            socket.emit('code_generated', socket.sessionId);
         } catch (err) {
             console.log("error at generating code", err)
         }
@@ -50,10 +46,11 @@ io.on('connection', (socket) => {
             let roomStatus = await getRoomStatus(sessionId);
             switch (roomStatus) {
                 case "roomValid":
+                    socket.userType = "guest"
+                    socket.sessionId = sessionId
                     let user = new User(socket.id, displayName);
                     await addUserToRoom(sessionId, 'guest', user);
                     const parsedRoomInfo = await getParsedRoomInfo(sessionId)
-                    socket.userType = "guest"
                     io.to([parsedRoomInfo.host.userId, parsedRoomInfo.guest.userId]).emit('all_users_validated', parsedRoomInfo)
                     break;
                 case "roomFull":
@@ -82,13 +79,19 @@ io.on('connection', (socket) => {
         }
     })  
 
-    socket.on('disconnect', () => {
-        console.log('user disconnected', socket.userType)
-
-        //get room info
-        //if user or guest is null, remove the room from the database
-        //else remove socket.userType from the room, notify other user
-
+    socket.on('disconnect', async () => {
+        try {
+            const roomInfo = await getRoomInfo(socket.sessionId);
+            if (!roomInfo.users.guest || !roomInfo.users.host) {
+                await removeRoomFromDatabase(socket.sessionId)
+                console.log(`both users disconnected, room ${socket.sessionId} removed from db`)
+            } else {
+                await removeUserFromRoom(socket.userType, socket.sessionId)
+                console.log(`user type ${socket.userType} removed from room`)
+            }
+        } catch (err) {
+            console.log("go fuck yourself ", err)
+        }
     })
 })
 
@@ -111,14 +114,7 @@ const handleMediatorResponse = async (roomInfo) => {
 const parseRoomInfoToClientData = (roomInfo) => {
     return {
         sessionId: roomInfo.sessionId,
-        host: {
-            displayName: roomInfo.users.host.displayName,
-            userId: roomInfo.users.host.userId
-        },
-        guest: {
-            displayName: roomInfo.users.guest.displayName,
-            userId: roomInfo.users.guest.userId
-        }
+        ...roomInfo.users
     }
 }
 
