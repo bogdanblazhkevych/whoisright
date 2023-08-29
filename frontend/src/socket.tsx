@@ -24,8 +24,9 @@ interface ClientToServerEvents {
   join_room: (sessionId: string) => void;
   generate_code: (displayName: string) => void;
   validate_code: (codeInput: string, displayName: string) => void;
+  user_disconnected: (userType: 'host' | 'guest') => void;
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://192.168.1.52:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`192.168.1.8:8000`);
 
 export default socket

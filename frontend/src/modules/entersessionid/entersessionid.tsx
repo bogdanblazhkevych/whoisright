@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import entersessionidcss from './entersessionid.module.css'
 
 interface EnterSessionIdPropsInterface {
