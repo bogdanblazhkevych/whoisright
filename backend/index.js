@@ -8,6 +8,7 @@ import {addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMes
 import { Room } from './room.js'
 import { User } from './user.js';
 import getMediatorResponse from './mediator.js';
+import Message from './message.js'
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://192.168.1.5:3000`,
+    origin: `http://192.168.1.8:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -70,13 +71,10 @@ io.on('connection', (socket) => {
     })
 
     socket.on('send_message', async (messageData) => {
-        let serverMessage = mapMessageDataToServerSchema(messageData);
-        let clientMessage = mapMessageDataToClientSchema(messageData);
-
-        socket.to(messageData.sessionId).emit('receive_message', clientMessage)
-
+        let message = new Message(messageData.message, messageData.sessionId, 'incomming', messageData.userId, messageData.displayName, 'user')
+        socket.to(messageData.sessionId).emit('receive_message', message.clientSchema())
         try {
-            await addMessageToRoom(messageData.sessionId, serverMessage)
+            await addMessageToRoom(messageData.sessionId, message.serverSchema())
             let roomInfo = await getRoomInfo(messageData.sessionId)
             handleMediatorResponse(roomInfo)
         } catch (err) {
@@ -94,50 +92,14 @@ const handleMediatorResponse = async (roomInfo) => {
     if (roomInfo.messages.length % 3 != 0) {
         return
     }
-
     try {
-        let response = await getMediatorResponse(roomInfo.messages)
-        let serverMessage = mapMediatorResponseToServerSchema(response);
-        let clientMessage = mapMediatorResponseToClientSchema(response, roomInfo.sessionId)
-        await addMessageToRoom(roomInfo.sessionId, serverMessage);
-        io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('receive_message', clientMessage)
+        let response = await getMediatorResponse(roomInfo.messages);
+        let message = new Message(response, roomInfo.sessionId, 'mediator', 'Mediator', 'Mediator', 'assistant')
+        await addMessageToRoom(roomInfo.sessionId, message.serverSchema());
+        io.to([roomInfo.users.host.userId, roomInfo.users.guest.userId]).emit('receive_message', message.clientSchema())
     } catch (err) {
         console.log("error in handling mediator response", err)
     }
-}
-
-const mapMediatorResponseToServerSchema = (response) => {
-    let serverMessageNode = {
-        role: "assistant",
-        name: "Mediator",
-        content: response
-    }
-
-    return serverMessageNode
-}
-
-const mapMediatorResponseToClientSchema = (response, sessionId) => {
-    let clientMessageNode = {
-        message: response,
-        sessionId: sessionId,
-        type: 'mediator',
-        userId: 'Mediator',
-        displayName: 'Mediator'
-    }
-
-    return clientMessageNode
-}
-
-const mapMessageDataToServerSchema = (messageData) => {
-    return {
-        "role": messageData.displayName == "Mediator" ? "assistant" : "user",
-        "name": messageData.displayName,
-        "content": messageData.message
-    }
-}
-
-const mapMessageDataToClientSchema = (messageData) => {
-    return {...messageData, type: "incomming"}
 }
 
 //TODO: rename functon. maybe mapRoomInfoToClientSchema
