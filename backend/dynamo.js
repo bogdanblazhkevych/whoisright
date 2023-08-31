@@ -35,11 +35,15 @@ const addUserToRoom = async (sessionId, userType, user) => {
         },
         ExpressionAttributeValues: {
             ':userDetails': AWS.DynamoDB.Converter.marshall({user}).user
-        }
+        },
+        ReturnValues: "ALL_NEW"
     };
     try {
         const data = await dynamoClient.updateItem(params).promise();
-        console.log(`Chatroom updated with ${userType} information:`, data);
+        // console.log(`Chatroom updated with ${userType} information:`, AWS.DynamoDB.Converter.unmarshall(data.Attributes));
+        console.log("add users to room data dot item : ", data)
+        console.log('add users to room data unmarshaled: ', AWS.DynamoDB.Converter.unmarshall(data.Attributes))
+        return AWS.DynamoDB.Converter.unmarshall(data.Attributes)
     } catch (err) {
         console.error('Error adding user to chatroom:', err);
     }    
@@ -73,7 +77,7 @@ const getRoomInfo = async (sessionId) => {
         const parsedData = AWS.DynamoDB.Converter.unmarshall(data.Item);
         return parsedData
     } catch (err) {
-        console.log("error in getRoomData function: ", err)
+        console.log("error in getRoomInfo function: ", err)
     }
 }
 
@@ -87,7 +91,7 @@ const addMessageToRoom = async (sessionId, message) => {
     };
     try {
         const data = await dynamoClient.updateItem(params).promise()
-        console.log('message added to database sicessfully: ', data)
+        console.log('message added to database sucessfully: ', data)
     } catch (err) {
         console.log("error at adding message to database: ", err)
     }
@@ -145,17 +149,33 @@ const removeUserFromRoom = async (userType, sessionId) => {
     }   
 }
 
-
-const dbfunctions = {
-    addRoomToDatabase,
-    addUserToRoom,
-    checkIfRoomExists,
-    getRoomInfo,
-    addMessageToRoom,
-    getNumberOfMessages,
-    removeUserFromRoom,
-    removeRoomFromDatabase
+function dbfunctions() {
+    return Object.freeze({
+        addRoomToDatabase,
+        addUserToRoom,
+        checkIfRoomExists,
+        getRoomInfo,
+        addMessageToRoom,
+        getNumberOfMessages,
+        removeUserFromRoom,
+        removeRoomFromDatabase
+    })
 }
 
-export default dbfunctions
+const database = dbfunctions();
+export default database
+
+
+// const dbfunctions = {
+//     addRoomToDatabase,
+//     addUserToRoom,
+//     checkIfRoomExists,
+//     getRoomInfo,
+//     addMessageToRoom,
+//     getNumberOfMessages,
+//     removeUserFromRoom,
+//     removeRoomFromDatabase
+// }
+
+// export default dbfunctions
 export { addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom, getNumberOfMessages, removeUserFromRoom, removeRoomFromDatabase }
