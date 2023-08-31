@@ -1,7 +1,7 @@
 import User from './../user.js'
 
 export default function makeAddUserUseCase({ database }) {
-    return async function addUserUseCase(userId, displayName, userType) {
+    return async function addUserUseCase(userId, displayName, userType, sessionId) {
         let user = new User(userId, displayName);
         const roomInfo = await database.getRoomInfo(sessionId);
         if (!doesRoomExist(roomInfo)) {
@@ -28,8 +28,7 @@ export default function makeAddUserUseCase({ database }) {
     }
 
     async function addUser(sessionId, userType, user) {
-        let addedUser = await addUserToRoom(sessionId, userType, user);
-        console.log("here at addUser: ", addedUser)
+        let addedUser = await database.addUserToRoom(sessionId, userType, user);
         return {
             userAdded: true,
             data: { sessionId: addedUser.sessionId, ...addedUser.users }

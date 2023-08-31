@@ -4,13 +4,9 @@ import { Server } from 'socket.io';
 import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-// import {addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom, removeUserFromRoom, removeRoomFromDatabase} from './dynamo.js'
-import Room from './room.js'
-import database from './dynamo.js';
-import User from './user.js';
 import getMediatorResponse from './mediator.js';
 import Message from './message.js'
-import addRoom from './controllers/index.js';
+import { addRoom, addUser, addMessage } from './controllers/index.js';
 
 dotenv.config();
 
@@ -29,157 +25,40 @@ io.on('connection', (socket) => {
         socket.join(sessionId)
     })
 
-    // socket.on('generate_code', async (displayName) => {
-    //     socket.userType = "host"
-    //     socket.sessionId = generateCode()
-    //     let room = new Room(socket.sessionId)
-    //     let user = new User(socket.id, displayName)
-    //     try {
-    //         await addRoomToDatabase(room)
-    //         await addUserToRoom(socket.sessionId, 'host', user)
-    //         socket.emit('code_generated', socket.sessionId);
-    //     } catch (err) {
-    //         console.log("error at generating code", err)
-    //     }
-    // })
     socket.on('generate_code', async (displayName) => {
         socket.userType = "host"
         socket.sessionId = generateCode()
-        await addRoom(socket.sessionId, socket.userId, displayName)
+        await addRoom(socket.sessionId, socket.id, displayName, 'host')
         socket.emit('code_generated', socket.sessionId);
     })
 
-    //create new room
-    //create new user
-    //add user to room
-    //add room to db
-    //send data to client
+    socket.on('validate_code', async (sessionId, displayName) => {
+        let addUserData = await addUser(socket.id, displayName, 'guest', sessionId);
+        io.to(addUserData.target).emit(addUserData.callBack, addUserData.data);
+    })
 
-    // socket.on("validate_code", async (sessionId, displayName) => {
+    socket.on('send_message', async (messageData) => {
+        let addMessageData = await addMessage(messageData);
+        console.log("addMEssageData in io module: ", addMessageData)
+        socket.to(addMessageData.target).emit(addMessageData.callback, addMessageData.data)
+    })
+
+    // socket.on('send_message', async (messageData) => {
+    //     let message = Message.fromClientMessage(messageData)
+    //     socket.to(messageData.sessionId).emit('receive_message', message.clientSchema)
     //     try {
-    //         let roomStatus = await getRoomStatus(sessionId);
-    //         switch (roomStatus) {
-    //             case "roomValid":
-    //                 socket.userType = "guest"
-    //                 socket.sessionId = sessionId
-    //                 let user = new User(socket.id, displayName);
-    //                 await addUserToRoom(sessionId, 'guest', user);
-    //                 const parsedRoomInfo = await getParsedRoomInfo(sessionId)
-    //                 io.to([parsedRoomInfo.host.userId, parsedRoomInfo.guest.userId]).emit('all_users_validated', parsedRoomInfo)
-    //                 break;
-    //             case "roomFull":
-    //                 socket.emit("joinError", 'Room is full')
-    //                 break;
-    //             case "roomNotFound":
-    //                 socket.emit("joinError", "Room not found")
-    //                 break;
-    //             default:
-    //                 socket.emit("joinError", "unknownError")
-    //         }
+    //         await addMessageToRoom(messageData.sessionId, message.serverSchema)
+    //         let roomInfo = await getRoomInfo(messageData.sessionId)
+    //         handleMediatorResponse(roomInfo)
     //     } catch (err) {
-    //         console.log("error at validating code: ", err)
+    //         console.log('error in sending message async code')
     //     }
     // })
 
-    socket.on('validate_code', async (sessionId, displayName) => {
-        let addUserData = await addUserController(sessionId, socket.id, 'guest', displayName);
-        console.log("validate code user data log: ", addUserData.data)
-        io.to(addUserData.target).emit(addUserData.callBack, addUserData.data)
-    })
-
-    //validate room
-    //create new user
-    //add user to room
-    //get room info
-    //send room info to client
-
-    //create user controller:::::
-    //validates room
-    //creates user
-    //adds user to database
-    //returns room data
-
-    const addUserController = async (sessionId, userId, userType, displayName) => {
-        let userAdded = await makeAddUserUseCase(sessionId, userId, userType, displayName);
-        if (userAdded.userAdded) {
-            return {
-                target: [userAdded.data.guest.userId, userAdded.data.host.userId],
-                callBack: 'all_users_validated',
-                data: userAdded.data
-            }
-        }
-        return {
-            target: userId,
-            callBack: 'joinError',
-            data: userAdded.data
-        }
-    }
-
-    // const addUserUseCaseOld = async (sessionId, userId, displayName) => {
-    //     const roomInfo = await getRoomInfo(sessionId)
-    //     if (Object.keys(roomInfo).length === 0) {
-    //         return {target: userId, callBack: "joinError", args: "Room not found"}
-    //         // return "roomNotFound"
-    //     } else if (roomInfo.users.guest.userId !== null) {
-    //         return {target: userId, callBack: "joinError", args: "Room is full"}
-    //         // return "roomFull"
-    //     } else {
-    //         let user = new User(userId, displayName);
-    //         let addedUser = await addUserToRoom(sessionId, 'guest', user);
-    //         let roomInfo = { sessionId: addedUser.sessionId, ...addedUser };
-    //         return {target: [roomInfo.host.userId, roomInfo.guest.userId], callBack: 'all_users_validated', roomInfo}
-    //         // return "roomValid"
-    //     }
-    // }
-
-    const makeAddUserUseCase = async (sessionId, userId, userType, displayName) => {
-        const addUserUseCase = async (userId, displayName, userType) => {
-            let user = new User(userId, displayName);
-            const roomInfo = await database.getRoomInfo(sessionId);
-            console.log("hererere")
-            if (!doesRoomExist(roomInfo)) {
-                return {
-                    userAdded: false,
-                    data: "room not found"
-                }
-            }
-            if (isRoomFull(roomInfo)) {
-                return {
-                    userAdded: false,
-                    data: "room is full"
-                }
-            }
-            return addUser(sessionId, userType, user)
-        }
-        const isRoomFull = (roomInfo) => {
-            return roomInfo.users.guest.userId !== null ? true : false
-        }
-        const doesRoomExist = (roomInfo) => {
-            return Object.keys(roomInfo).length !== 0 ? true : false
-        }
-        const addUser = async (sessionId, userType, user) => {
-            let addedUser = await addUserToRoom(sessionId, userType, user);
-            console.log("here at addUser: ", addedUser)
-            return {
-                userAdded: true,
-                data: { sessionId: addedUser.sessionId, ...addedUser.users }
-            }
-        }
-        return addUserUseCase(userId, displayName, userType)
-    }
-
-
-    socket.on('send_message', async (messageData) => {
-        let message = Message.fromClientMessage(messageData)
-        socket.to(messageData.sessionId).emit('receive_message', message.clientSchema)
-        try {
-            await addMessageToRoom(messageData.sessionId, message.serverSchema)
-            let roomInfo = await getRoomInfo(messageData.sessionId)
-            handleMediatorResponse(roomInfo)
-        } catch (err) {
-            console.log('error in sending message async code')
-        }
-    })  
+    //add comment 
+    //send to fromt end
+    //handle gpt response
+    //send to front end
 
     socket.on('disconnect', async () => {
         try {
