@@ -32,6 +32,8 @@ io.on('connection', (socket) => {
     })
 
     socket.on('validate_code', async (sessionId, displayName) => {
+        socket.userType = "guest"
+        socket.sessionId = sessionId
         let addUserData = await addUser(socket.id, displayName, 'guest', sessionId);
         io.to(addUserData.target).emit(addUserData.callBack, addUserData.data);
     })
@@ -59,6 +61,24 @@ io.on('connection', (socket) => {
         }
     })
 })
+
+//user had been removed 
+///////////////////////
+//target: non-removed user id
+//callback: user-removed
+//data: removed users name
+
+//room has been removed 
+///////////////////////
+//target: ''
+//callback: ''
+//data: ''
+
+//error in removing room or user
+///////////////////////
+//target: ''
+//callback: ''
+//data: ''
 
 //TODO: maybe rename function to fit with create... naming consistency
 function generateCode() {
