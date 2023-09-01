@@ -9,11 +9,24 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-export default async function getMediatorResponse(messages) {
+const getMediatorResponse = async (messages) => {
     const completion = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: messages,
     });
 
-    return completion.data.choices[0].message.content
+    console.log("messages argument within mediator module: ", messages)
+
+    return completion.data.choices[0].message.content ?? null
 }
+
+function mediatorFunctions() {
+    return Object.freeze({
+        getMediatorResponse
+    })
+}
+
+const mediator = mediatorFunctions();
+export default mediator;
+
+export { getMediatorResponse }

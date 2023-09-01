@@ -90,10 +90,12 @@ const addMessageToRoom = async (sessionId, message) => {
         ExpressionAttributeValues: {':newMessage': {"L": [AWS.DynamoDB.Converter.marshall({message}).message]}}
     };
     try {
-        const data = await dynamoClient.updateItem(params).promise()
+        const data = await dynamoClient.updateItem(params).promise();
         console.log('message added to database sucessfully: ', data)
+        return true;
     } catch (err) {
         console.log("error at adding message to database: ", err)
+        return false;
     }
 }
 
@@ -165,17 +167,4 @@ function dbfunctions() {
 const database = dbfunctions();
 export default database
 
-
-// const dbfunctions = {
-//     addRoomToDatabase,
-//     addUserToRoom,
-//     checkIfRoomExists,
-//     getRoomInfo,
-//     addMessageToRoom,
-//     getNumberOfMessages,
-//     removeUserFromRoom,
-//     removeRoomFromDatabase
-// }
-
-// export default dbfunctions
 export { addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom, getNumberOfMessages, removeUserFromRoom, removeRoomFromDatabase }

@@ -15,5 +15,6 @@ export default function makeAddMessageController({addMessageUseCase}) {
             callback: '',
             data: ''
         }
+        //TODO: do more error handling here and in use case
     }
 }
