@@ -10,14 +10,15 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const getMediatorResponse = async (messages) => {
-    const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: messages,
-    });
-
-    console.log("messages argument within mediator module: ", messages)
-
-    return completion.data.choices[0].message.content ?? null
+    try {
+        const completion = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: messages,
+        })
+        return completion.data.choices[0].message.content
+    } catch (err) {
+        throw new Error("failed to get mediator response")
+    }
 }
 
 function mediatorFunctions() {

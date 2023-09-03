@@ -1,20 +1,18 @@
 export default function makeAddMessageController({addMessageUseCase}) {
     return async function addMessageController(messageData) {
-        let addMessageResponse = await addMessageUseCase(messageData);
-
-        if (addMessageResponse.messageAdded) {
+        try {
+            let addMessageResponse = await addMessageUseCase(messageData);
             return {
-                target: addMessageResponse.data.sessionId,
-                callback: 'receive_message',
-                data: addMessageResponse.data
+                target: addMessageResponse.sessionId,
+                callBack: 'receive_message',
+                data: addMessageResponse
+            }
+        } catch (err) {
+            return {
+                target: addMessageResponse.sessionId,
+                callBack: 'error',
+                data: err.message ?? 'error adding message'
             }
         }
-
-        return {
-            target: '',
-            callback: '',
-            data: ''
-        }
-        //TODO: do more error handling here and in use case
     }
 }

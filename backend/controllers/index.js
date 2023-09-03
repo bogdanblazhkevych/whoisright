@@ -21,10 +21,3 @@ const controllerService = Object.freeze({
 
 export default controllerService
 export { addRoom, addUser, addMessage, addMediatorResponse, removeUser }
-
-//controller return schema:
-// {
-//     target: string | string[],
-//     callback: string,
-//     data: any
-// }

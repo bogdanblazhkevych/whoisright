@@ -1,15 +1,15 @@
 export default function makeRemoveUserUseCase({ database }) {
     return async function removeUserUseCase(sessionId, userType) {
-        let removeUserData = await database.removeUserFromRoom(userType, sessionId);
-        if (isRoomEmpty(removeUserData)) {
-            await removeRoom(sessionId);
-            return
-        } else {
-            const remainingUserType = userType == "host" ? "guest" : "host"
-            return {
-                removedUserName: removeUserData.users[userType].displayName,
-                remainingUserId: removeUserData.users[remainingUserType].userId
+        try {
+            let removeUserData = await database.removeUserFromRoom(userType, sessionId);
+            if (isRoomEmpty(removeUserData)) {
+                await removeRoom(sessionId);
+                throw new Error("removed room from database")
+            } else {
+                return removeUserData.users[userType].displayName
             }
+        } catch (err) {
+            throw err
         }
     }
 
@@ -21,7 +21,7 @@ export default function makeRemoveUserUseCase({ database }) {
         try {
             await database.removeRoomFromDatabase(sessionId);
         } catch (err) {
-            console.log("error calling removeRoomFromDatabase in removeUserUseCase", err)
+            throw new Error(`error removing room from database, : ${err.message}`)
         }
     }
 }

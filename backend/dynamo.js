@@ -93,10 +93,9 @@ const addMessageToRoom = async (sessionId, message) => {
     try {
         const data = await dynamoClient.updateItem(params).promise();
         console.log('message added to database sucessfully: ', data)
-        return true;
     } catch (err) {
         console.log("error at adding message to database: ", err)
-        return false;
+        throw new Error("failed to add message to database")
     }
 }
 
@@ -125,15 +124,13 @@ const removeRoomFromDatabase = async (sessionId) => {
     try {
         await dynamoClient.deleteItem(params).promise();
         console.log(`chatroom ${sessionId} has been deleted`);
-        
     } catch (err) {
         console.log("error in removing room from database: ", err)
-        
+        throw Error("failed to remove room from database")
     }
 }
 
 const removeUserFromRoom = async (userType, sessionId) => {
-    //do something
     const params = {
         TableName: "chatrooms",
         Key: {sessionId : {"S": sessionId}},
@@ -152,6 +149,7 @@ const removeUserFromRoom = async (userType, sessionId) => {
         return AWS.DynamoDB.Converter.unmarshall(data.Attributes)
     } catch (err) {
         console.error('Error removing user from room:', err);
+        throw new Error('failed to remove user from database')
     }   
 }
 

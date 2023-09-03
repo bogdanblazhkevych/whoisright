@@ -39,9 +39,10 @@ io.on('connection', (socket) => {
 
     socket.on('send_message', async (messageData) => {
         let addMessageData = await addMessage(messageData);
-        socket.to(addMessageData.target).emit(addMessageData.callback, addMessageData.data)
+        socket.to(addMessageData.target).emit(addMessageData.callBack, addMessageData.data)
         let mediatorResponseData = await addMediatorResponse(messageData.sessionId)
         io.to(mediatorResponseData.target).emit(mediatorResponseData.callback, mediatorResponseData.data)
+
     })
 
     socket.on('disconnect', async () => {
