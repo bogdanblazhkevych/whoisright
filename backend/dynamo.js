@@ -40,8 +40,6 @@ const addUserToRoom = async (sessionId, userType, user) => {
     };
     try {
         const data = await dynamoClient.updateItem(params).promise();
-        // console.log(`Chatroom updated with ${userType} information:`, AWS.DynamoDB.Converter.unmarshall(data.Attributes));
-        console.log("add users to room data dot item : ", data)
         console.log('add users to room data unmarshaled: ', AWS.DynamoDB.Converter.unmarshall(data.Attributes))
         return AWS.DynamoDB.Converter.unmarshall(data.Attributes)
     } catch (err) {
@@ -144,11 +142,10 @@ const removeUserFromRoom = async (userType, sessionId) => {
         ExpressionAttributeValues: {
             ':userDetails' : {"NULL": true}
         },
-        ReturnValues: "ALL_NEW"
+        ReturnValues: "ALL_OLD"
     }
     try {
         const data = await dynamoClient.updateItem(params).promise();
-        console.log(`Chatroom removed ${userType} from room`, data);
         return AWS.DynamoDB.Converter.unmarshall(data.Attributes)
     } catch (err) {
         console.error('Error removing user from room:', err);
