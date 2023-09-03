@@ -149,7 +149,7 @@ const removeUserFromRoom = async (userType, sessionId) => {
     try {
         const data = await dynamoClient.updateItem(params).promise();
         console.log(`Chatroom removed ${userType} from room`, data);
-        return data
+        return AWS.DynamoDB.Converter.unmarshall(data.Attributes)
     } catch (err) {
         console.error('Error removing user from room:', err);
     }   

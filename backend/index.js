@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import { addRoom, addUser, addMessage, addMediatorResponse } from './controllers/index.js';
+import { addRoom, addUser, addMessage, addMediatorResponse, removeUser } from './controllers/index.js';
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://10.94.73.170:3000`,
+    origin: `http://172.20.10.2:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
@@ -46,39 +46,27 @@ io.on('connection', (socket) => {
     })
 
     socket.on('disconnect', async () => {
-        try {
-            console.log('disconnect session id: ', socket.sessionId)
-            const roomInfo = await getRoomInfo(socket.sessionId);
-            if (!roomInfo.users.guest || !roomInfo.users.host) {
-                await removeRoomFromDatabase(socket.sessionId)
-                console.log(`both users disconnected, room ${socket.sessionId} removed from db`)
-            } else {
-                await removeUserFromRoom(socket.userType, socket.sessionId)
-                console.log(`user type ${socket.userType} removed from room`)
-            }
-        } catch (err) {
-            console.log("go fuck yourself ", err)
-        }
+        let removeUserData = await removeUser(socket.sessionId, socket.userType)
+        console.log("remove user data log in socket instance: ", removeUserData)
     })
+
+    // socket.on('disconnect', async () => {
+    //     try {
+    //         console.log('disconnect session id: ', socket.sessionId)
+    //         const roomInfo = await getRoomInfo(socket.sessionId);
+    //         if (!roomInfo.users.guest || !roomInfo.users.host) {
+    //             await removeRoomFromDatabase(socket.sessionId)
+    //             console.log(`both users disconnected, room ${socket.sessionId} removed from db`)
+    //         } else {
+    //             await removeUserFromRoom(socket.userType, socket.sessionId)
+    //             console.log(`user type ${socket.userType} removed from room`)
+    //         }
+    //     } catch (err) {
+    //         console.log("go fuck yourself ", err)
+    //     }
+    // })
 })
 
-//user had been removed 
-///////////////////////
-//target: non-removed user id
-//callback: user-removed
-//data: removed users name
-
-//room has been removed 
-///////////////////////
-//target: ''
-//callback: ''
-//data: ''
-
-//error in removing room or user
-///////////////////////
-//target: ''
-//callback: ''
-//data: ''
 
 //TODO: maybe rename function to fit with create... naming consistency
 function generateCode() {
