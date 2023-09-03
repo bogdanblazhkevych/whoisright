@@ -8,21 +8,3 @@ export default function makeRemoveUserController({ removeUserUseCase }) {
         }
     }
 }
-
-//user had been removed 
-///////////////////////
-//target: non-removed user id
-//callback: user-removed
-//data: removed users name
-
-//room has been removed 
-///////////////////////
-//target: ''
-//callback: ''
-//data: ''
-
-//error in removing room or user
-///////////////////////
-//target: ''
-//callback: ''
-//data: ''

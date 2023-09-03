@@ -21,6 +21,7 @@ const addRoomToDatabase = async (room) => {
         console.log('Chatroom created sucessfully', data)
     } catch (err) {
         console.error('error creating chatroom')
+        throw new Error("failed to add room to database")
     }
 }
 
@@ -44,6 +45,7 @@ const addUserToRoom = async (sessionId, userType, user) => {
         return AWS.DynamoDB.Converter.unmarshall(data.Attributes)
     } catch (err) {
         console.error('Error adding user to chatroom:', err);
+        throw new Error("failed to add user to room")
     }    
 }
 
@@ -76,6 +78,7 @@ const getRoomInfo = async (sessionId) => {
         return parsedData
     } catch (err) {
         console.log("error in getRoomInfo function: ", err)
+        throw new Error("failed to retrieve room info")
     }
 }
 

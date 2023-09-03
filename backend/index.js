@@ -26,9 +26,8 @@ io.on('connection', (socket) => {
     socket.on('generate_code', async (displayName) => {
         socket.userType = "host"
         socket.sessionId = generateCode()
-        await addRoom(socket.sessionId, socket.id, displayName, 'host')
-        socket.emit('code_generated', socket.sessionId);
-        //TODO: return data from addRoom call and send that to the client 
+        let addRoomData = await addRoom(socket.sessionId, socket.id, displayName, 'host')
+        io.to(addRoomData.target).emit(addRoomData.callBack, addRoomData.data)
     })
 
     socket.on('validate_code', async (sessionId, displayName) => {
@@ -48,27 +47,9 @@ io.on('connection', (socket) => {
     socket.on('disconnect', async () => {
         let removeUserData = await removeUser(socket.sessionId, socket.userType)
         console.log("remove user data log in socket instance: ", removeUserData)
-    })
-
-    // socket.on('disconnect', async () => {
-    //     try {
-    //         console.log('disconnect session id: ', socket.sessionId)
-    //         const roomInfo = await getRoomInfo(socket.sessionId);
-    //         if (!roomInfo.users.guest || !roomInfo.users.host) {
-    //             await removeRoomFromDatabase(socket.sessionId)
-    //             console.log(`both users disconnected, room ${socket.sessionId} removed from db`)
-    //         } else {
-    //             await removeUserFromRoom(socket.userType, socket.sessionId)
-    //             console.log(`user type ${socket.userType} removed from room`)
-    //         }
-    //     } catch (err) {
-    //         console.log("go fuck yourself ", err)
-    //     }
-    // })
+    })    
 })
 
-
-//TODO: maybe rename function to fit with create... naming consistency
 function generateCode() {
     return crypto.randomBytes(3).toString('hex').toUpperCase()
 }
