@@ -43,9 +43,6 @@ export default function Chat(props: ChatPropsInterface){
             console.log(message)
             setMessageLog((previous) => [...previous, message])            
         })
-
-        //on userDisconnected, add message to message log
-
     }, [socket])
 
     function sendMessage(message: string) {
