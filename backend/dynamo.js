@@ -21,6 +21,7 @@ const addRoomToDatabase = async (room) => {
         console.log('Chatroom created sucessfully', data)
     } catch (err) {
         console.error('error creating chatroom')
+        throw new Error("failed to add room to database")
     }
 }
 
@@ -35,13 +36,16 @@ const addUserToRoom = async (sessionId, userType, user) => {
         },
         ExpressionAttributeValues: {
             ':userDetails': AWS.DynamoDB.Converter.marshall({user}).user
-        }
+        },
+        ReturnValues: "ALL_NEW"
     };
     try {
         const data = await dynamoClient.updateItem(params).promise();
-        console.log(`Chatroom updated with ${userType} information:`, data);
+        console.log('add users to room data unmarshaled: ', AWS.DynamoDB.Converter.unmarshall(data.Attributes))
+        return AWS.DynamoDB.Converter.unmarshall(data.Attributes)
     } catch (err) {
         console.error('Error adding user to chatroom:', err);
+        throw new Error("failed to add user to room")
     }    
 }
 
@@ -73,7 +77,8 @@ const getRoomInfo = async (sessionId) => {
         const parsedData = AWS.DynamoDB.Converter.unmarshall(data.Item);
         return parsedData
     } catch (err) {
-        console.log("error in getRoomData function: ", err)
+        console.log("error in getRoomInfo function: ", err)
+        throw new Error("failed to retrieve room info")
     }
 }
 
@@ -86,10 +91,11 @@ const addMessageToRoom = async (sessionId, message) => {
         ExpressionAttributeValues: {':newMessage': {"L": [AWS.DynamoDB.Converter.marshall({message}).message]}}
     };
     try {
-        const data = await dynamoClient.updateItem(params).promise()
-        console.log('message added to database sicessfully: ', data)
+        const data = await dynamoClient.updateItem(params).promise();
+        console.log('message added to database sucessfully: ', data)
     } catch (err) {
         console.log("error at adding message to database: ", err)
+        throw new Error("failed to add message to database")
     }
 }
 
@@ -117,14 +123,14 @@ const removeRoomFromDatabase = async (sessionId) => {
     }
     try {
         await dynamoClient.deleteItem(params).promise();
-        console.log(`chatroom ${sessionId} has been deleted`)
+        console.log(`chatroom ${sessionId} has been deleted`);
     } catch (err) {
         console.log("error in removing room from database: ", err)
+        throw Error("failed to remove room from database")
     }
 }
 
 const removeUserFromRoom = async (userType, sessionId) => {
-    //do something
     const params = {
         TableName: "chatrooms",
         Key: {sessionId : {"S": sessionId}},
@@ -135,27 +141,32 @@ const removeUserFromRoom = async (userType, sessionId) => {
         },
         ExpressionAttributeValues: {
             ':userDetails' : {"NULL": true}
-        }
+        },
+        ReturnValues: "ALL_OLD"
     }
     try {
         const data = await dynamoClient.updateItem(params).promise();
-        console.log(`Chatroom removed ${userType} from room`, data);
+        return AWS.DynamoDB.Converter.unmarshall(data.Attributes)
     } catch (err) {
         console.error('Error removing user from room:', err);
+        throw new Error('failed to remove user from database')
     }   
 }
 
-
-const dbfunctions = {
-    addRoomToDatabase,
-    addUserToRoom,
-    checkIfRoomExists,
-    getRoomInfo,
-    addMessageToRoom,
-    getNumberOfMessages,
-    removeUserFromRoom,
-    removeRoomFromDatabase
+function dbfunctions() {
+    return Object.freeze({
+        addRoomToDatabase,
+        addUserToRoom,
+        checkIfRoomExists,
+        getRoomInfo,
+        addMessageToRoom,
+        getNumberOfMessages,
+        removeUserFromRoom,
+        removeRoomFromDatabase
+    })
 }
 
-export default dbfunctions
+const database = dbfunctions();
+export default database
+
 export { addRoomToDatabase, addUserToRoom, checkIfRoomExists, getRoomInfo, addMessageToRoom, getNumberOfMessages, removeUserFromRoom, removeRoomFromDatabase }

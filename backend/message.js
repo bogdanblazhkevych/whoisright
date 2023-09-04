@@ -31,6 +31,6 @@ export default class Message {
     }
 
     static fromMediatorResponse(mediatorResponse, sessionId) {
-        return new Message(mediatorResponse, sessionId, 'mediator', 'Mediator', 'Mediator')
+        return new Message(mediatorResponse, sessionId, 'mediator', 'Mediator', 'Mediator', 'assistant')
     }
 }
