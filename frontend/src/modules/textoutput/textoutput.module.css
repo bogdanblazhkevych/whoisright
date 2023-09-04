@@ -1,10 +1,14 @@
 .textoutputwrapper{
-    box-sizing: border-box;
+    /* box-sizing: border-box;
+    border: 1px solid red; */
     flex-grow: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     padding: 10px;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+    /* margin-bottom: 5rem; */
 }
 
 .textoutputwrapper::-webkit-scrollbar {
