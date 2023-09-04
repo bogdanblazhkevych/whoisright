@@ -18,6 +18,13 @@ const io = new Server(server, {
     },
 });
 
+//TODO: 
+// - client side error handling for generating code, sending messages, disconnecting
+// - handle client side disconnecting
+// - move entity logic into entity folder
+// - move API keys and secrets from .env to aws secrets manager
+// - tweak frontend UI
+
 io.on('connection', (socket) => { 
     socket.on('join_room', (sessionId) => {
         socket.join(sessionId)
@@ -48,6 +55,8 @@ io.on('connection', (socket) => {
     socket.on('disconnect', async () => {
         let removeUserData = await removeUser(socket.sessionId, socket.userType)
         console.log("remove user data log in socket instance: ", removeUserData)
+        socket.to(removeUserData.target).emit(removeUserData.callBack, removeUserData.data)
+        //TODO: handle errirs on client side
     })    
 })
 

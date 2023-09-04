@@ -4,7 +4,7 @@ export default function makeRemoveUserController({ removeUserUseCase }) {
             let removeUserData = await removeUserUseCase(sessionId, userType);
             return {
                 target: sessionId,
-                callBack: 'user-removed',
+                callBack: 'receive_message',
                 data: removeUserData
             }
         } catch (err) {

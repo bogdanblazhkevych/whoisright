@@ -1,3 +1,5 @@
+import Message from "../message.js";
+
 export default function makeRemoveUserUseCase({ database }) {
     return async function removeUserUseCase(sessionId, userType) {
         try {
@@ -6,7 +8,10 @@ export default function makeRemoveUserUseCase({ database }) {
                 await removeRoom(sessionId);
                 throw new Error("removed room from database")
             } else {
-                return removeUserData.users[userType].displayName
+                let removedUserDisplayName = removeUserData.users[userType].displayName;
+                let removedUserMessage = `user ${removedUserDisplayName} has disconected from the chatroom`
+                let message = new Message(removedUserMessage, sessionId, 'system', 'system', 'system', 'system')
+                return message.clientSchema
             }
         } catch (err) {
             throw err
