@@ -1,4 +1,4 @@
-import Message from "../message.js";
+import Message from "../entities/message.js";
 
 export default function makeAddMediatorResponseUseCase({ database, mediator }) {
     return async function addMediatorResponseUseCase(sessionId) {

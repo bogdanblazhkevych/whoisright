@@ -1,4 +1,4 @@
-import Room from '../room.js'
+import Room from '../entities/room.js'
 
 export default function makeAddRoomUseCase({database}) {
     return async function addRoomUseCase(sessionId) {
