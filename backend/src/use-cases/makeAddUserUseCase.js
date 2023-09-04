@@ -1,4 +1,4 @@
-import User from './../user.js'
+import User from '../entities/user.js'
 
 export default function makeAddUserUseCase({ database }) {
     return async function addUserUseCase(userId, displayName, userType, sessionId) {

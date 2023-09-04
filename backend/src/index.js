@@ -53,9 +53,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', async () => {
         let removeUserData = await removeUser(socket.sessionId, socket.userType)
-        console.log("remove user data log in socket instance: ", removeUserData)
         socket.to(removeUserData.target).emit(removeUserData.callBack, removeUserData.data)
-        //TODO: handle errirs on client side
     })    
 })
 
