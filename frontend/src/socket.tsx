@@ -16,7 +16,8 @@ interface ServerToClientEvents {
   receive_message: (dataObject: {message: string, sessionId: string, type: string, userId: string, displayName: string}) => void,
   code_generated: (a: string) => void,
   all_users_validated: (chatData: ChatDataInterface) => void,
-  joinError: (errorName: string) => void
+  joinError: (errorName: string) => void,
+  error: (errorName: string) => void
 }
 
 interface ClientToServerEvents {

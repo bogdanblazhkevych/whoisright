@@ -31,6 +31,7 @@
     background-color: transparent;
 }
 
+
 .message{
     /* padding: 0.2rem;
     margin: 0.1rem; */
@@ -40,6 +41,10 @@
     margin-bottom: 5px;
     display: inline-block;
     max-width: 70%;
+}
+.system{
+    max-width: 100%;
+    color: #939393;
 }
 
 .incomming{

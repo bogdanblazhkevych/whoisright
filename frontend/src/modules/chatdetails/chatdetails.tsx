@@ -4,7 +4,6 @@ import chatdetailscss from './chatdetails.module.css'
 interface ChatDetailsPropsInterface {
     chatData: {
         sessionId: string,
-        // role: string,
         host: {
           displayName: string,
           userId: string
@@ -18,9 +17,6 @@ interface ChatDetailsPropsInterface {
 
 export default function ChatDetails(props: ChatDetailsPropsInterface){
     const { chatData } = props
-    useEffect(() => {
-        console.log(chatData)
-    })
     return(
         <div className={chatdetailscss.chatdetailswrapper}>
             <div className={chatdetailscss.iconswrapper}>
