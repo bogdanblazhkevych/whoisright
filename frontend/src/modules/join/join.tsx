@@ -79,21 +79,21 @@ export default function Join(props: JoinPropsInterface) {
         })
 
         socket.on("joinError", (errorName) => {
-            setJoinError(() => {
-                return {
-                    error: true,
-                    errorMessage: errorName
-                }
+            setJoinError({
+                error: true,
+                errorMessage: errorName
             })
 
             setTimeout(() => {
-                setJoinError(() => {
-                    return {
-                        error: false,
-                        errorMessage: ''
-                    }
+                setJoinError({
+                    error: false,
+                    errorMessage: ''
                 })
             }, 1000)
+        })
+
+        socket.on('error', (errorName) => {
+            console.log(errorName)
         })
     }, [socket])
 
