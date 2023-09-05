@@ -59,10 +59,12 @@ export default function Chat(props: ChatPropsInterface){
     }
 
     return(
-        <div className={chatcss.chatwrapper}>
-            <ChatDetails chatData={chatData}/>
-            <Textoutput messageLog={messageLog}/>
-            <TextInput sendMessage={sendMessage} didUserSendLastMessage={didUserSendLastMessage}/>
+        <div className={chatcss.test}>
+            <div className={chatcss.chatwrapper}>
+                <ChatDetails chatData={chatData}/>
+                <Textoutput messageLog={messageLog}/>
+                <TextInput sendMessage={sendMessage} didUserSendLastMessage={didUserSendLastMessage}/>
+            </div>
         </div>
     )
 }

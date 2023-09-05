@@ -28,6 +28,6 @@ interface ClientToServerEvents {
   user_disconnected: (userType: 'host' | 'guest') => void;
 }
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`192.168.1.9:8000`);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`192.168.1.3:8000`);
 
 export default socket
