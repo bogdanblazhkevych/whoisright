@@ -18,8 +18,6 @@
 
 .textoutputwrapper::-webkit-scrollbar-thumb{
     background: rgb(186,186,192,1);
-    /* border: 1px solid black; */
-    /* height: 50px; */
 }
 
 .textoutputwrapper::-webkit-scrollbar-track-piece:end {
@@ -32,43 +30,7 @@
     margin-top: 10px;
 }
 
-
-/* .textoutputwrapper::-webkit-scrollbar {
-    background-color: #362d3b;
-    width: 8px;
-}
-
-.textoutputwrapper::-webkit-scrollbar-thumb {
-    background-color: red;
-}
-
-
-.textoutputwrapper::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgba(255,255,255,0) 20%, rgba(186,186,192,1) 20%);
-    height: 50px;
-    background: red;
-    background-color: #babac0;
-    border-radius: 16px;
-    border: 2px solid #1e1e1e;
-}
-
-.textoutputwrapper::-webkit-scrollbar-track {
-    background-color: #1E1E1E;
-}
-
-
-.textoutputwrapper::-webkit-scrollbar-button {
-    display: none;
-}
-
-.textoutputwrapper::-webkit-scrollbar-corner {
-    background-color: transparent;
-} */
-
-
 .message{
-    /* padding: 0.2rem;
-    margin: 0.1rem; */
     border-radius: 20px;
     padding: 8px 15px;
     margin-top: 5px;
@@ -78,12 +40,13 @@
 }
 .system{
     max-width: 100%;
+    font-size: 80%;
     color: #939393;
 }
 
 .incomming{
-    background-color: #3a3a3c;
-    color: #E1E1E3;
+    background-color: var(--text-grey-color);
+    color: var(--text-color);
     align-self: flex-start;
     text-align: left;
     border-radius: 20px 20px 20px 0px;
@@ -106,7 +69,7 @@
 }
 
 .sender{
-    color: #939393;
+    color: var(--sender-label-color);
     font-size: 50%;
 }
 

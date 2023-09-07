@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+  <!-- style="--information-display: flex;" -->
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1" /> -->
-    <meta name="theme-color" content="#1e1e1e" />
+    <!-- <meta name="theme-color" content="#1e1e1e" /> -->
+    <meta name="theme-color" content="rgb(245,245,245)" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1e1e1e" media="(prefers-color-scheme: dark)">
     <!-- <meta name="viewport" content="viewport-fit=cover" /> -->
     <meta
       name="viewport"
@@ -20,6 +23,7 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="stylesheet" type="text/css" href="index.css">
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.

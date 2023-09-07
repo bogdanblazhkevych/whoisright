@@ -2,7 +2,6 @@
     /* box-sizing: border-box;
     border: 1px solid green; */
     position: absolute;
-    /* top: 0px; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -10,14 +9,13 @@
     padding: 10px 0px 10px 0px;
     background-color: var(--backdrop-blur-color);
     backdrop-filter: blur(20px);
-    /* position: relative; */
     position: absolute;
     bottom: 0;
     width: 100%;
-    /* border-top: 2px solid #4C4C4C; */
 }
 
 .typefield{
+    /* box-sizing: border-box; */
     /* border: 1px solid green; */
     width: 90%;
     position: relative;
@@ -38,12 +36,9 @@
     box-shadow: none;
     box-sizing: border-box;
     border-radius: 20px;
-    border: 2px solid #4C4C4C;
-    /* background-color: #1E1E1E; */
-    /* background-color: var(--backdrop-blur-color); */
+    border: 2px solid var(--thin-border-color);
     background: transparent;
-    /* backdrop-filter: blur(20px); */
-    color: white;
+    color: var(--text-color);
     font-size: 1rem;
     padding: 8px 15px;
     padding-right: 35px;
@@ -55,7 +50,7 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    border: 2px solid #4C4C4C;
+    border: 2px solid var(--thin-border-color);
     outline: none;
     box-shadow: none;
 }
@@ -70,21 +65,26 @@
 }
 
 .sendbutton{
+    /* box-sizing: border-box; */
+    /* border: 1px solid yellow; */
     position: absolute;
     height: 100%;
     right: 0;
     display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .arrowicon{
+    /* box-sizing: border-box; */
+    /* border: 1px solid blue; */
     font-size: calc(1rem + 16px);
     position: relative;
-    color: #148AFF;
-    align-self: flex-end;
+    color: var(--send-message-icon-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0px 4px 4px 0px;
+    padding-right: 4px;
 }
 
 .arrowicon > svg{

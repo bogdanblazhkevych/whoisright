@@ -1,16 +1,21 @@
 :root {
-  /* --backdrop-color: rgb(30, 30, 30); */
-  --backdrop-color: rgb(0, 0, 0);
-  /* --backdrop-blur-color: rgba(30,30,30, 0.6); */
-  --backdrop-blur-color: rgba(0, 0, 0, 0.6);
-  --secondary-color: rgb(30, 30, 30);
-  /* --secondary-color: #403a36; */
-  /* --secondary-color: #1c1c1c; */
+  --backdrop-color: #ffffff;
+  --backdrop-blur-color: rgba(254,254,254, 0.6);
+  --secondary-color: rgb(245,245,245);
   --text-blue-color: #148AFF;
-  --text-grey-color: #3a3a3c;
-  --text-purple-color: #362d3b;
-  --text-color: #E1E1E3;
+  --text-grey-color: #E9E9EB;
+  --text-purple-color: #be9dd0;
+  --text-purple-color-light-shade: #dab4ee;
+  --text-color: #020204;
   --test: blue;
+  --thin-border-color: rgb(192,192,192);
+  --home-text-color: #363636;
+  --sender-label-color: #8F8F8F;
+  --mediator-icon-darker-shade: #ad87c2;
+  --mediator-icon-lighter-shade: #d8b2ec;
+  --user-icon-darker-shade: #c1c1c4;
+  --user-icon-lighter-shade: #dfdfe0;
+  --send-message-icon-color: #148AFF;
 }
 
 body {
@@ -26,3 +31,31 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --backdrop-color: #000000;
+    --backdrop-blur-color: rgba(0, 0, 0, 0.6);
+    --secondary-color: #1e1e1e;
+    --text-blue-color: #148AFF;
+    --text-grey-color: #3a3a3c;
+    --text-purple-color: #362d3b;
+    --text-color: #E1E1E3;
+    --test: blue;
+    --thin-border-color: #4C4C4C;
+    --home-text-color: #9f9fa0;
+    --sender-label-color: #939393;
+    --mediator-icon-darker-shade: #362d4a;
+    --mediator-icon-lighter-shade: #564875;
+    --user-icon-darker-shade: #4e4e4e;
+    --user-icon-lighter-shade: #6d6d6d;
+
+  }
+}
+
+/* @media (prefers-color-scheme: light) {
+  :root {
+    --background-color: black;
+    --text-color: white;
+  }
+} */
