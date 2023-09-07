@@ -80,7 +80,6 @@
     /* border: 1px solid blue; */
     font-size: calc(1rem + 16px);
     position: relative;
-    /* color: #148AFF; */
     color: var(--send-message-icon-color);
     display: flex;
     justify-content: center;
