@@ -2,7 +2,6 @@
     /* box-sizing: border-box;
     border: 1px solid green; */
     position: absolute;
-    /* top: 0px; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -10,15 +9,13 @@
     padding: 10px 0px 10px 0px;
     background-color: var(--backdrop-blur-color);
     backdrop-filter: blur(20px);
-    /* position: relative; */
     position: absolute;
     bottom: 0;
     width: 100%;
-    /* border-top: 2px solid #4C4C4C; */
 }
 
 .typefield{
-    box-sizing: border-box;
+    /* box-sizing: border-box; */
     /* border: 1px solid green; */
     width: 90%;
     position: relative;
@@ -40,10 +37,7 @@
     box-sizing: border-box;
     border-radius: 20px;
     border: 2px solid var(--thin-border-color);
-    /* background-color: #1E1E1E; */
-    /* background-color: var(--backdrop-blur-color); */
     background: transparent;
-    /* backdrop-filter: blur(20px); */
     color: var(--text-color);
     font-size: 1rem;
     padding: 8px 15px;
@@ -86,8 +80,8 @@
     /* border: 1px solid blue; */
     font-size: calc(1rem + 16px);
     position: relative;
-    color: #148AFF;
-    /* align-self: flex-end; */
+    /* color: #148AFF; */
+    color: var(--send-message-icon-color);
     display: flex;
     justify-content: center;
     align-items: center;

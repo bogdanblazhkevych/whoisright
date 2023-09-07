@@ -45,6 +45,10 @@ export default function Chat(props: ChatPropsInterface){
         })
     }, [socket])
 
+    useEffect(() => {
+        didUserSendLastMessage()
+    })
+
     function sendMessage(message: string) {
         socket.emit("send_message", {message, sessionId, type, userId, displayName})
         setMessageLog((previous) => [...previous, {message, sessionId, type, userId, displayName}]) 
@@ -52,7 +56,13 @@ export default function Chat(props: ChatPropsInterface){
 
     function didUserSendLastMessage() {
         if (messageLog.length > 0) {
-            return messageLog[messageLog.length - 1].userId == userId
+            if (messageLog[messageLog.length - 1].userId == userId) {
+                document.documentElement.style.setProperty("--send-message-icon-color", '#888D97')
+                return true
+            } else {
+                document.documentElement.style.setProperty("--send-message-icon-color", '#148AFF')
+                return false
+            }
         } else {
             return false
         }

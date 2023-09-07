@@ -15,7 +15,7 @@
   --mediator-icon-lighter-shade: #d8b2ec;
   --user-icon-darker-shade: #c1c1c4;
   --user-icon-lighter-shade: #dfdfe0;
-  /* --information-display: flex; */
+  --send-message-icon-color: #148AFF;
 }
 
 body {
