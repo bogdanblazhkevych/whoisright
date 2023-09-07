@@ -13,16 +13,13 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-    origin: `http://192.168.1.9:3000`,
+    origin: `http://192.168.1.3:3000`,
       methods: ["GET", "POST", "FETCH"],
     },
 });
 
 //TODO: 
-// - client side error handling for generating code, sending messages, disconnecting
-// - move entity logic into entity folder
 // - move API keys and secrets from .env to aws secrets manager
-// - tweak frontend UI
 
 io.on('connection', (socket) => { 
     socket.on('join_room', (sessionId) => {

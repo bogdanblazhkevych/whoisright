@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import './App.css';
+import About from './modules/about/about';
 import Chat from './modules/chat/chat';
 import Join from './modules/join/join';
 
@@ -43,6 +44,7 @@ function App() {
 
       {currentDisplay === "chatroom" && 
         <>
+          <About />
           <Chat chatData={chatData} userType={userType}/>
         </>
       }
