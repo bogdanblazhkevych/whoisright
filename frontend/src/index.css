@@ -11,6 +11,7 @@
   --text-purple-color: #362d3b;
   --text-color: #E1E1E3;
   --test: blue;
+  --information-display: flex
 }
 
 body {
