@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import chatdetailscss from './chatdetails.module.css'
-import { HiOutlineInformationCircle, HiOutlineXCircle } from "react-icons/hi";
-import { BsWindowDesktop } from "react-icons/bs";
+import { HiOutlineXCircle } from "react-icons/hi";
+import { IoMdInformationCircleOutline } from "react-icons/io";
 
 interface ChatDetailsPropsInterface {
     chatData: {
@@ -46,7 +46,7 @@ export default function ChatDetails(props: ChatDetailsPropsInterface){
         <div className={chatdetailscss.chatdetailswrapper}>
             <div className={chatdetailscss.chatdetailscontainer}>
                 <div className={chatdetailscss.informationtoggle} onClick={handleClick}>
-                    {infoHidden ? <HiOutlineInformationCircle /> : <HiOutlineXCircle />}
+                    {infoHidden ? <IoMdInformationCircleOutline /> : <HiOutlineXCircle />}
                 </div>
                 <div className={chatdetailscss.iconswrapper}>
                     <div className={chatdetailscss.usericon}>
