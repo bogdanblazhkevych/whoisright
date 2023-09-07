@@ -25,10 +25,10 @@ export default function Home(props: HomePropsInterface) {
                         Get started by entering your name in the input field.
                     </div>
                     <div className={homecss.body}>
-                        Select <span style={{ color: "#E1E1E3", fontWeight: 800 }}>Create Session</span> to create a chat room. Relay the generated session code to the opposing party.
+                        Select <span className={homecss.bodyspan}>Create Session</span> to create a chat room. Relay the generated session code to the opposing party.
                     </div>
                     <div className={homecss.body}>
-                        Select <span style={{ color: "#E1E1E3", fontWeight: 800 }}>Join Session</span> if you have received a session code to be connected with the opposing party.
+                        Select <span className={homecss.bodyspan}>Join Session</span> if you have received a session code to be connected with the opposing party.
                     </div>
                 </div>
 

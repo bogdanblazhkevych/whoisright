@@ -38,7 +38,7 @@
     box-shadow: none;
     box-sizing: border-box;
     border-radius: 20px;
-    border: 2px solid #4C4C4C;
+    border: 2px solid var(--thin-border-color);
     /* background-color: #1E1E1E; */
     /* background-color: var(--backdrop-blur-color); */
     background: transparent;

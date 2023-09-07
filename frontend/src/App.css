@@ -8,7 +8,7 @@
   box-sizing: border-box;
   min-height: 100vh;
   width: 100vw;
-  background-color: #1E1E1E;
+  background-color: var(--secondary-color);
   position: relative;
 }
 .temp{
@@ -20,15 +20,15 @@
 }
 
 html{
-  background-color: #1E1E1E;
+  background-color: var(--backdrop-color);
 }
 
 body{
-  background-color: #1E1E1E;
+  background-color: var(--backdrop-color);
 }
 
 #root{
-  background-color: #1E1E1E;
+  background-color: var(--backdrop-color);
 }
 
 /* @media only screen and (max-width: 700px){

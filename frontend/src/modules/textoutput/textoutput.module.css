@@ -82,8 +82,8 @@
 }
 
 .incomming{
-    background-color: #3a3a3c;
-    color: #E1E1E3;
+    background-color: var(--text-grey-color);
+    color: var(--text-color);
     align-self: flex-start;
     text-align: left;
     border-radius: 20px 20px 20px 0px;
@@ -106,7 +106,7 @@
 }
 
 .sender{
-    color: #939393;
+    color: var(--sender-label-color);
     font-size: 50%;
 }
 

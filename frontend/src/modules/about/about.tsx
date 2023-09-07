@@ -29,16 +29,16 @@ export default function About() {
                     Why Chose WHOISRIGHT.ME?
                 </div>
 
-                <div className={aboutcss.body} style={{color: "#E1E1E3"}}>
+                <div className={aboutcss.body} style={{color: "var(--text-color)"}}>
                     <ul>
                         <li>
-                            <span style={{ color: "#E1E1E3", fontWeight: 800 }}>Fairness:</span> <span style={{color:'#9f9fa0'}}>We're committed to fairness and impartiality. Our AI Conflict Mediator ensures that all parties get a fair chance to express their views.</span>
+                            <span style={{ color: "var(--text-color)", fontWeight: 800 }}>Fairness:</span> <span style={{color:'var(--home-text-color)'}}>We're committed to fairness and impartiality. Our AI Conflict Mediator ensures that all parties get a fair chance to express their views.</span>
                         </li>
                         <li>
-                        <span style={{ color: "#E1E1E3", fontWeight: 800 }}>Privacy:</span> <span style={{color:'#9f9fa0'}}>We prioritize your privacy. We do not collect any personal data and and once your discussions conclude, they are promptly and permanently deleted from our platform. </span>
+                        <span style={{ color: "var(--text-color)", fontWeight: 800 }}>Privacy:</span> <span style={{color:'var(--home-text-color)'}}>We prioritize your privacy. We do not collect any personal data and and once your discussions conclude, they are promptly and permanently deleted from our platform. </span>
                         </li>
                         <li>
-                        <span style={{ color: "#E1E1E3", fontWeight: 800 }}>Empowerment:</span> <span style={{color:'#9f9fa0'}}>WhoIsRight.me empowers you to engage in meaningful conversations, explore different perspectives, and ultimately, find common ground.</span>
+                        <span style={{ color: "var(--text-color)", fontWeight: 800 }}>Empowerment:</span> <span style={{color:'var(--home-text-color)'}}>WhoIsRight.me empowers you to engage in meaningful conversations, explore different perspectives, and ultimately, find common ground.</span>
                         </li>
                     </ul>
                 </div>
