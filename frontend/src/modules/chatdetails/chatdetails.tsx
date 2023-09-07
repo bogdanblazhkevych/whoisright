@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import chatdetailscss from './chatdetails.module.css'
 import { HiOutlineInformationCircle, HiOutlineXCircle } from "react-icons/hi";
+import { BsWindowDesktop } from "react-icons/bs";
 
 interface ChatDetailsPropsInterface {
     chatData: {
@@ -18,10 +19,21 @@ interface ChatDetailsPropsInterface {
 
 export default function ChatDetails(props: ChatDetailsPropsInterface){
     const { chatData } = props;
-    const [infoHidden, setInfoHidden] = useState(false)
+    const [infoHidden, setInfoHidden] = useState<boolean>()
+
+    useEffect(() => {
+        if (window.screen.width > 1400) {
+            document.documentElement.style.setProperty('--information-display', 'flex');
+            setInfoHidden(false)
+        } else {
+            document.documentElement.style.setProperty('--information-display', 'none');
+            setInfoHidden(true)
+        }
+    }, [])
     
     const handleClick = () => {
         const currentDisplaySetting = document.documentElement.style.getPropertyValue('--information-display');
+        console.log(currentDisplaySetting)
         if (currentDisplaySetting == "flex") {
             document.documentElement.style.setProperty('--information-display', 'none');
             setInfoHidden(true)
