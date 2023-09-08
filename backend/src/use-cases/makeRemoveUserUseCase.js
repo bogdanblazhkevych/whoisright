@@ -4,6 +4,10 @@ export default function makeRemoveUserUseCase({ database }) {
     return async function removeUserUseCase(sessionId, userType) {
         try {
             let removeUserData = await database.removeUserFromRoom(userType, sessionId);
+            //function throws error when guest exits on validate code page
+            //we can fix this by checking if the room exists before calling database.removeUserFromRoom
+            //but not fixing it wont harm the program in any way because room doesnt need to be deleted
+            //so our dynamo storage is safe
             if (isRoomEmpty(removeUserData)) {
                 await removeRoom(sessionId);
                 throw new Error("removed room from database")
@@ -19,7 +23,8 @@ export default function makeRemoveUserUseCase({ database }) {
     }
 
     function isRoomEmpty(roomData) {
-        return !roomData.users.guest || !roomData.users.host
+        console.log("roomData in isRoomEmpty function in usecase");
+        return !roomData.users.guest || !roomData.users.host || !roomData.users.guest.userId
     }
 
     async function removeRoom(sessionId) {

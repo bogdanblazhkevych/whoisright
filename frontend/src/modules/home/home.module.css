@@ -101,3 +101,7 @@
     text-align: center;
     font-size: 1rem;
 }
+
+.divbutton:hover{
+    cursor: pointer
+}

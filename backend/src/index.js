@@ -49,6 +49,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('disconnect', async () => {
+        console.log("someone is trying to disconnect: ", socket.id)
         let removeUserData = await removeUser(socket.sessionId, socket.userType)
         socket.to(removeUserData.target).emit(removeUserData.callBack, removeUserData.data)
     })    

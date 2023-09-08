@@ -18,6 +18,10 @@
     font-weight: 800;
 }
 
+.headingbold:hover{
+    cursor: pointer;
+}
+
 .codeinput{
     appearance: none;
     -webkit-appearance: none;
