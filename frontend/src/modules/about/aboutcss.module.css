@@ -1,5 +1,3 @@
-
-
 .aboutwrapper{
     box-sizing: border-box;
     /* border: 1px solid red; */
@@ -13,13 +11,11 @@
     flex-direction: column;
     align-items: center;
     --spacing: 1.8vh;
-    /* justify-content: center; */
 }
 
 .heading{
     font-weight: 800;
     color: var(--text-color);
-    /* padding: 1rem 0; */
     padding: var(--spacing) 0;
 }
 
@@ -31,7 +27,6 @@
     text-align: left;
     color: var(--text-color);
     width: 90%;
-    /* padding-bottom: 1rem; */
     padding-bottom: var(--spacing);
 }
 
@@ -43,7 +38,6 @@
     text-align: center;
     text-align: left;
     color: var(--home-text-color);
-    /* padding-bottom: 1rem; */
     padding-bottom: var(--spacing);
     width: 90%;
 }
@@ -55,7 +49,6 @@ ul{
 }
 
 li{
-    /* padding-bottom: 1rem; */
     padding-bottom: var(--spacing);
 }
 
