@@ -1,6 +1,54 @@
 .displaysessionidwrapper{
+    box-sizing: border-box;
+    /* border: 1px solid yellow; */
+    width: fit-content;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-size: 3rem;
-    align-self: center;
+    font-size: 6rem;
     color: var(--text-color);
 }
+
+.heading{
+    box-sizing: border-box;
+    /* border: 1px solid green; */
+    text-align: center;
+    /* font-size: 43%; */
+    font-size: 24%;
+    width: 100%;
+}
+
+.sessionid{
+    box-sizing: border-box;
+    /* border: 1px solid red; */
+    align-self: center;
+    color: var(--text-color);
+    font-weight: 800;
+    display: flex;
+}
+
+.body{
+    box-sizing: border-box;
+    /* border: 1px solid green; */
+    font-size: 24%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.customloader {
+    /* box-sizing: border-box; */
+    /* border: 1px solid yellow; */
+    width: 1rem;
+    aspect-ratio: 1 / 1;
+    margin: 1rem 1rem;
+    background: var(--thin-border-color);
+    border-radius: 50%;
+    box-shadow: 2rem 0 var(--text-grey-color),-2rem 0 var(--thin-border-color);
+    animation:d5 1s infinite linear alternate;
+  }
+
+  @keyframes d5 {
+      0% {box-shadow: 2rem 0 var(--thin-border-color),-2rem 0 var(--text-grey-color);background: var(--thin-border-color)}
+      33%{box-shadow: 2rem 0 var(--thin-border-color),-2rem 0 var(--text-grey-color);background: var(--text-grey-color)}
+      66%{box-shadow: 2rem 0 var(--text-grey-color),-2rem 0 var(--thin-border-color);background: var(--text-grey-color)}
+  }
