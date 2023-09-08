@@ -10,7 +10,18 @@ export default function Displaysessionid (props: DisplaySessionIdPropsInterface)
 
     return (
         <div className={displaysessionidcss.displaysessionidwrapper}>
-            {sessionId}
+            <div className={displaysessionidcss.heading}>
+            Send this code to the opposing party
+            </div>
+            <div className={displaysessionidcss.sessionid}>
+                {sessionId}
+            </div>
+            <div className={displaysessionidcss.body}>
+                <div>
+                    Waiting for opponent
+                </div>
+                <div className={displaysessionidcss.customloader}></div>
+                </div>
         </div>
     )
 }
