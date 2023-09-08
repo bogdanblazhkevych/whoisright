@@ -112,7 +112,8 @@ export default function Join(props: JoinPropsInterface) {
                 <Entersessionid handleCodeInputChange={handleCodeInputChange} 
                                 handleKeyDown={handleKeyDown} 
                                 codeInput={codeInput} 
-                                joinError={joinError}/>
+                                joinError={joinError}
+                                createSession={createSession}/>
             }
         </div>
     )
